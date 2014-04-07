@@ -13,8 +13,8 @@ import GameState.GameStateManager;
 
 public class GamePanel extends JPanel implements Runnable, KeyListener{
 
-	public static final int WIDTH = 240;
-	public static final int HEIGHT = 320;
+	public static final int WIDTH = 320;
+	public static final int HEIGHT = 240;
 	public static final int SCALE = 2;
 	
 	private Thread thread;
@@ -50,6 +50,7 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 			}
 		} catch (Exception e){
 			System.out.println("AW SHIT SON");
+			e.printStackTrace();
 		}
 	}
 	
@@ -68,7 +69,6 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 
 	@Override
 	public void keyPressed(KeyEvent e) {
-		System.out.println("Doge");
 		gsm.keyPressed(e.getKeyCode());
 		
 	}

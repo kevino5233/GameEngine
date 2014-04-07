@@ -3,25 +3,40 @@ package GameState;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
+import javax.sound.sampled.Clip;
+import javax.swing.Timer;
 
-public class MenuState extends GameState{
+import Main.GamePanel;
+
+public class MenuState extends GameState implements ActionListener{
 
 	BufferedImage bg;
 	
-	private int currentChoice = 0;
+	private int pos = 0;
+	private int dpos;
 	private String[] options = { "Start", "Help", "Quit" };
 	
 	private Color titleColor;
 	private Font titleFont;
 	
+	private Timer timer;
+	
 	public MenuState(GameStateManager gsm){
 		this.gsm = gsm;
 		
+		
+	}
+	
+	@Override
+	public void init() {
 		try{
 			bg = ImageIO.read(new File("./Resources/Backgrounds/background.png"));
 			
@@ -32,10 +47,9 @@ public class MenuState extends GameState{
 			e.printStackTrace();
 			System.out.println("you done fucked up");
 		}
-	}
-	
-	@Override
-	public void init() {
+		
+		timer = new Timer(500, this);
+		timer.setInitialDelay(0);
 		
 	}
 
@@ -48,14 +62,18 @@ public class MenuState extends GameState{
 	@Override
 	public void draw(Graphics2D g) {
 		
-		g.drawImage(bg.getScaledInstance(480, 640, 0), 0, 0, null);
+		g.drawImage(bg.getScaledInstance(GamePanel.WIDTH * GamePanel.SCALE, GamePanel.HEIGHT * GamePanel.SCALE, 0), 
+					0, 
+					0, 
+					null
+					);
 		
 		g.setColor(titleColor);
 		g.setFont(titleFont);
 		g.drawString("Cats in the orange tree", 100, 100);
 		
 		for (int i = 0; i < options.length; i++){
-			if (i == currentChoice){
+			if (i == pos){
 				g.setColor(Color.ORANGE);
 			} else {
 				g.setColor(Color.GREEN);
@@ -67,16 +85,35 @@ public class MenuState extends GameState{
 
 	@Override
 	public void keyPressed(int k) {
-		System.out.println("Doge");
-		currentChoice++;
-		currentChoice %= 3;
+		if (k == KeyEvent.VK_UP){
+			dpos = -1;
+			timer.start();
+		} else if (k == KeyEvent.VK_DOWN){
+			dpos = 1;
+			timer.start();
+		} else if (k == KeyEvent.VK_ENTER){
+			switch(pos){
+			case 0 : gsm.setState(1); break;
+			case 1 : break; //open the thing
+			case 2 : System.exit(0);
+			}
+		}
 		
 	}
 
 	@Override
 	public void keyReleased(int k) {
-		// TODO Auto-generated method stub
-		
+		timer.stop();
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		pos += dpos;
+		if (pos == options.length){
+			pos = options.length - 1;
+		} else if (pos < 0){
+			pos = 0;
+		}
 	}
 	
 }

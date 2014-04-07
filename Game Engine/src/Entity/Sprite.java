@@ -1,5 +1,7 @@
 package Entity;
 
+import TileMap.TileMap;
+
 public abstract class Sprite{
 	
 	//check over stuff

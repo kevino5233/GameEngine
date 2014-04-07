@@ -23,9 +23,9 @@ public class GameStateManager {
 	//add the other levelstates later
 	
 	public GameStateManager(){
-		currentState = MENUSTATE;
 		gameStates[0] = new MenuState(this);
-		//gameState[1] = new HubState(this);
+		gameStates[1] = new HubState(this);
+		setState(0);
 		//initialize menustate
 	}
 	
@@ -58,11 +58,13 @@ public class GameStateManager {
 	public boolean getEarth(){ return earth; }
 	public boolean getAir(){ return air; }
 	
+	public int getDifficulty(){ return difficulty; }
+	
 	public void keyPressed(int k){
 		gameStates[currentState].keyPressed(k);
 	}
 	
 	public void keyReleased(int k){
-		gameStates[currentState].keyPressed(k);
+		gameStates[currentState].keyReleased(k);
 	}
 }
