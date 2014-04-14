@@ -1,5 +1,7 @@
 package Entity;
 
+import java.awt.Rectangle;
+
 import TileMap.TileMap;
 
 public abstract class Sprite{
@@ -16,7 +18,7 @@ public abstract class Sprite{
 	protected boolean topLeft, topRight, bottomLeft, bottomRight;
 	
 	protected double terminalVelocity;
-	
+	 
 	protected Animation animatino;
 	protected int currentState;
 	protected boolean right;
@@ -34,43 +36,52 @@ public abstract class Sprite{
     public int getHeight(){ return height;} 
     
     public abstract void init();
-    public abstract void collide(Sprite sp, int code);
+    public abstract void collide(Rectangle rec, int code);
     
     public Sprite(TileMap tm){
     	tileMap = tm;
     	tileSize = tm.getTileSize();
     }
     
-    public static int isTouching(Sprite a, Sprite b){
-        int x = a.getX();
-        int x2 = x + a.getWidth();
-        int y = a.getY();
-        int y2 = y + a.getHeight();
+    public static int isTouching(Rectangle a, Rectangle b){
+    	
+    	System.out.println("Tile :: " + a.getX() + ", " + a.getY());
+		System.out.println("Player :: " + b.getX() + ", " + b.getY());
+    	
+        double x = a.getX();
+        double x2 = x + a.getWidth();
+        double y = a.getY();
+        double y2 = y + a.getHeight();
         
-        int i = b.getX();
-        int i2 = i + b.getWidth();
-        int j = b.getY();
-        int j2 = j + b.getHeight();
+        double i = b.getX();
+        double i2 = i + b.getWidth();
+        double j = b.getY();
+        double j2 = j + b.getHeight();
         
-        int i_x = Math.abs(i - x);
-		int x_i2 = Math.abs(x - i2);
-		int i_x2 = Math.abs(i - x2);
-		int x2_i2 = Math.abs(x2 - i2);
+        double i_x = Math.abs(i - x);
+		double x_i2 = Math.abs(x - i2);
+		double i_x2 = Math.abs(i - x2);
+		double x2_i2 = Math.abs(x2 - i2);
         
-        int j_y = Math.abs(j - y);
-		int y_j2 = Math.abs(y - j2);
-		int j_y2 = Math.abs(j - y2);
-		int y2_j2 = Math.abs(y2 - j2);
+        double j_y = Math.abs(j - y);
+		double y_j2 = Math.abs(y - j2);
+		double j_y2 = Math.abs(j - y2);
+		double y2_j2 = Math.abs(y2 - j2);
 		
-        if (j2 >= y && j < y && ((i >= x && i2 <= x2) || (i2 > x && i < x) || (i < x2 && i2 > x2)) && (j_y > y_j2 && i_x <= x_i2 && i_x2 >= x2_i2)){
-			return UP;
+        if (y <= j2 && y > j && ((i >= x && i2 <= x2) || (i2 > x && i < x) || (i < x2 && i2 > x2)) && (j_y > y_j2 && i_x <= x_i2 && i_x2 >= x2_i2)){
+        	System.out.println("UP");
+        	return UP;
 		} else if (j < y2 && j2 > y2 && ((i >= x && i2 <= x2) || (i2 > x && i < x) || (i < x2 && i2 > x2)) && ( j_y2 < y2_j2)){
+			System.out.println("DOWN");
 			return DOWN;
-		} else if (i2 > x && i < x && ((j >= y && j2 <= y2) || (j2 > y && j < y) || (j < y2 && j2 > y2)) && ( i_x > x_i2)) {	
+		} else if (i2 > x && i < x && ((j >= y && j2 <= y2) || (j2 > y && j < y) || (j < y2 && j2 > y2)) && ( i_x > x_i2)) {
+			System.out.println("LEFT");
 			return LEFT;
 		} else if (i > x && i < x2 && ((j >= y && j2 <= y2) || (j2 > y && j < y) || (j < y2 && j2 > y2)) && ( (i_x2 < x2_i2))){
+			System.out.println("RIGHT");
 			return RIGHT;
 		}
+        System.out.println("NOPE");
 		return -1;
     }
 }

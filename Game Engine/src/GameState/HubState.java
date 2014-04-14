@@ -31,7 +31,6 @@ public class HubState extends GameState{
 	@Override
 	public void init() {
 		try{
-			System.out.println("Initing...");
 			tileMap = new TileMap("hub");
 			player = new Player(tileMap, gsm.getFire(), gsm.getAir(), gsm.getDifficulty());
 			bg = ImageIO.read(new File("./Resources/Backgrounds/hub.png"));
@@ -50,11 +49,11 @@ public class HubState extends GameState{
 	public void draw(Graphics2D g) {
 
 		try{
-			g.drawImage(bg.getScaledInstance(GamePanel.WIDTH * GamePanel.SCALE, GamePanel.HEIGHT * GamePanel.SCALE, 0), 
-					0, 
-					0, 
-					null
-					);
+//			g.drawImage(bg.getScaledInstance(GamePanel.WIDTH * GamePanel.SCALE, GamePanel.HEIGHT * GamePanel.SCALE, 0), 
+//					0, 
+//					0, 
+//					null
+//					);
 			
 			tileMap.draw(g);
 			player.draw(g);

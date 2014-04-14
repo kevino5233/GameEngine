@@ -1,6 +1,7 @@
 package Entity;
 
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -17,10 +18,10 @@ public class Player extends Sprite{
 	
 	private int framesInvincible;
 	
-	private static final double GRAVITY = 1.0;
+	private static final double GRAVITY = 0.5;
 	private double jumpStart, stopJumpSpeed;
 	
-	private boolean jumping;
+	private boolean moving;
 	
 	BufferedImage[][] spriteSheet;
 	
@@ -50,13 +51,13 @@ public class Player extends Sprite{
 		
 		framesInvincible = 0;
 		
-		terminalVelocity = air ? 40 : 30;
+		terminalVelocity = air ? 20 : 10;
 		jumpStart = -terminalVelocity;
 		stopJumpSpeed = .3;
 		
 		right = true;
 		
-		spriteSheet = new BufferedImage[2][];
+		spriteSheet = new BufferedImage[4][];
 		
 		try{
 			BufferedImage temp = ImageIO.read(new File("Resources/Sprites/Player/player" + (fire ? "-fire" : "") + ".png"));
@@ -72,6 +73,7 @@ public class Player extends Sprite{
 		}
 
 		currentState = IDLE;
+		moving = false;
 		animatino = new Animation();
 		animatino.setFrames(spriteSheet[IDLE], 10);
 		
@@ -79,136 +81,127 @@ public class Player extends Sprite{
 	
 	public void getNextPosition(){
 		
-		double xtemp = x;
-		double ytemp = y;
+		//recycle old physics code ASAP
 		
+		if (dy > terminalVelocity) {
+			dy = terminalVelocity;
+		}
 		
-		dy += GRAVITY;
-		if (dy > terminalVelocity) dy = terminalVelocity;
-		
-		if (dy < 0 && !jumping) dy += stopJumpSpeed;
-		int x1 = (int) (xtemp) / tileSize;
-		int y1 = (int) (ytemp) / tileSize;
-        int x2 = (int) (xtemp + width) / tileSize;
-        int y2 = (int) (ytemp + height) / tileSize;
-//    	if (tileMap.getTile(x1 / tileSize, y1 / tileSize).getType() == Tile.BLOCKING){
-//       		topLeft = true;
-//       	}
-//       	if (tileMap.getTile((int)x2, y1 / tileSize).getType() == Tile.BLOCKING){
-//       		topRight = true;
-//       	}
-//       	if (tileMap.getTile(x1, (int)y2).getType() == Tile.BLOCKING){
-//       		bottomLeft = true;
-//       	}
-//       	if (tileMap.getTile(x2, y2).getType() == Tile.BLOCKING){
-//       		bottomRight = true;
-//       	}
-        
-        //checks tiles for collision
-        topLeft = tileMap.getTile(x1, y1).getType() == Tile.BLOCKING;
-        topRight = tileMap.getTile(x2, y1).getType() == Tile.BLOCKING;
-        bottomLeft = tileMap.getTile(x1, y2).getType() == Tile.BLOCKING;
-        bottomRight = tileMap.getTile(x2, y2).getType() == Tile.BLOCKING;
+		if (isAirborne()) {
+			dy += GRAVITY;
+		}
 
-        System.out.println(x1 + ", " +y1 + " type " + tileMap.getTile(x1, y1).getType() + " at " + dy + "speed");
-        
-        //handles collision
-       	if (/*dy < 0 && */(topLeft || topRight)){
-       		dy = 0;
-       		ytemp = (ytemp / tileSize) * tileSize + tileSize;
-       	} else if (/*dy > 0 && */(bottomLeft || bottomRight)){
-       		dy = 0;
-       		ytemp = (ytemp / tileSize) * tileSize;
-       	}
-       	if (/*dx < 0 && */(topLeft || bottomLeft)){
-       		xtemp = (xtemp / tileSize) * tileSize;
-       	} else if (/*dx > 0 && */(topRight || bottomRight)){
-       		xtemp = (xtemp / tileSize) * tileSize + tileSize;
-       	}
-
-		ytemp += dy * .1;
-		xtemp += dx;
-       	
-       	x = xtemp;
-       	y = ytemp;
-       	
-//       	System.out.println("Position " + x + " " + y);
-//		System.out.println("Velocity " + dx + " " + dy);
-//		System.out.println();
+		y += dy;
+		x += dx;
+		
+		tileMap.testTouch(this);
+		
 	}
 	
 	public void update(){
 		getNextPosition();
+		tileMap.center(x, y);
 		animatino.update();
 		//animation stuff
 	}
 	
 	public void draw(Graphics2D g){
 		BufferedImage temp = animatino.getImage();
-		int halfWidth = GamePanel.WIDTH;
-		g.drawImage(temp, (int)x * GamePanel.SCALE, (int)y * GamePanel.SCALE, null);
+		int draw_x = this.getX() - tileMap.getX();
+		int draw_y = this.getY() - tileMap.getY();
+		if (x > GamePanel.WIDTH / 2 && x + width < tileMap.getWidth() - GamePanel.WIDTH){
+			draw_x = GamePanel.WIDTH / 2;
+		}
+		if (y > GamePanel.HEIGHT / 2 && y + height < tileMap.getHeight() - GamePanel.HEIGHT){
+			draw_y = GamePanel.HEIGHT / 2;
+		}
+		g.drawImage(temp.getScaledInstance(getWidth() * GamePanel.SCALE, getHeight() * GamePanel.SCALE, 0), 
+				draw_x * GamePanel.SCALE, 
+				draw_y * GamePanel.SCALE, 
+				null
+				);
 		//draw on the stuff, make sure you account for map position
 	}
-
+	
+	private void turnLeft(){
+		right = false;
+		dx = -3;
+		if(!moving){
+			moving = true;
+		}
+		if (currentState != JUMPING && currentState != WALKING){
+			currentState = WALKING;
+			animatino.setFrames(spriteSheet[WALKING], 10);
+		}
+	}
+	
+	private void turnRight(){
+		right = true;
+		dx = 3;
+		if(!moving){
+			moving = true;
+		}
+		if (currentState != JUMPING && currentState != WALKING){
+			currentState = WALKING;
+			animatino.setFrames(spriteSheet[WALKING], 10);
+		}
+	}
+	
+	private void jump(){
+		if (currentState != JUMPING){
+			dy = jumpStart;
+			currentState = JUMPING;
+			animatino.setFrames(spriteSheet[JUMPING], 10);
+		}
+	}
+	
+	private void land(){
+		if (currentState == JUMPING){
+			dy = 0;
+			if (moving) currentState = WALKING;
+			else currentState = IDLE;
+		}
+	}
 
 	public void keyPressed(int k){
 		switch(k){
 		case KeyEvent.VK_UP : 
-			if (currentState != FALLING){
-				currentState = JUMPING;
-				dy = jumpStart;
-				jumping = true;
-				animatino.setFrames(spriteSheet[JUMPING], 10);
-			}
-
+			jump();
 			break;
 		case KeyEvent.VK_DOWN : 
 			if (currentState != JUMPING){
-				currentState = BLOCKING;
-				dy = 0;
-				dx = 0;
-				animatino.setFrames(spriteSheet[BLOCKING], 10);
+//				currentState = BLOCKING;
+//				dy = 0;
+//				dx = 0;
+//				animatino.setFrames(spriteSheet[BLOCKING], 10);
 			}
 
 			break;
 		case KeyEvent.VK_LEFT : 
-			if(currentState == IDLE){
-				currentState = WALKING;
-				animatino.setFrames(spriteSheet[WALKING], 10);
-			}
-			right = false;
-			dx = -1;
+			turnLeft();
 			break;
 		case KeyEvent.VK_RIGHT : 
-			if(currentState == IDLE){
-				currentState = WALKING;
-				animatino.setFrames(spriteSheet[WALKING], 10);
-			}
-			right = true;
-			dx = 1;
-
+			turnRight();
 			break;
 		}
 	}
 	
 	public void keyReleased(int k){
 		switch(k){
-		case KeyEvent.VK_UP : 
-			jumping = false;
-			if (currentState == FALLING) break;
-			animatino.setFrames(spriteSheet[IDLE], 10);
+		case KeyEvent.VK_UP :
+			dy /= 3;
 			break;
 		case KeyEvent.VK_DOWN : 
-			currentState = IDLE;
+			if (currentState != FALLING && currentState != JUMPING) /*or other ariel states*/currentState = IDLE;
 			animatino.setFrames(spriteSheet[IDLE], 10);
 			break;
 		case KeyEvent.VK_LEFT : 
-			currentState = IDLE;
+			if (currentState != FALLING && currentState != JUMPING) currentState = IDLE;
 			animatino.setFrames(spriteSheet[IDLE], 10);
 			dx = 0;
 			break;
 		case KeyEvent.VK_RIGHT : 
-			currentState = IDLE;
+			if (currentState != FALLING && currentState != JUMPING) currentState = IDLE;
 			animatino.setFrames(spriteSheet[IDLE], 20);
 			dx = 0;
 			break;
@@ -246,9 +239,39 @@ public class Player extends Sprite{
 	}
 
 	@Override
-	public void collide(Sprite sp, int code) {
-		// TODO Auto-generated method stub
-		
+	public void collide(Rectangle rec, int code) {
+		switch(code){
+		case -1 : currentState = JUMPING; break;
+		case Sprite.UP : 
+						y = rec.getY() - getHeight();
+						if (isAirborne()){
+							land(); 
+						}
+						if (y < 0){
+							y = 0;
+							dy *= -1;
+							dy /= 3;
+						}
+						break;
+		case Sprite.DOWN : 
+							y = rec.getY() + rec.getHeight();
+							if (dy < 0) {
+								dy *= -1;
+								dy /= 3.;
+							}
+							break;
+		case Sprite.RIGHT : 
+							x = rec.getX() + rec.getWidth();
+							break;
+		case Sprite.LEFT : 
+							x = rec.getX() - getWidth();
+							if (x < 0) x = 0;
+							break;
+		}
+//		System.out.println(rec);
+//		System.out.println("Tile :: " + rec.getX() + " " + rec.getY());
+//		System.out.println("Player :: " + x + " " + y);
+//		System.out.println();
 	}
 
 	@Override

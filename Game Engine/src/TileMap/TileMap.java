@@ -1,9 +1,15 @@
 package TileMap;
 
+import java.awt.Dimension;
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.File;
 
+import javax.imageio.ImageIO;
+import javax.swing.JFrame;
+
+import Entity.Sprite;
 import LevelMaker.LevelMakerData;
 import Main.GamePanel;
 
@@ -11,7 +17,7 @@ public class TileMap {
 
 	private final static int tileSize = 16;
 	
-	private int camX, camY;
+	private double camX, camY;
 	private int spawnX, spawnY;
 
 	private int rowOffset, colOffset;
@@ -22,7 +28,7 @@ public class TileMap {
 	
 	private int numTilesAcross;
 	
-	private BufferedImage tileMap;
+	private BufferedImage tileMap, background;
 	
 //	spawn enemies 3 tiles before camera
 //	despawn enemies 10 tiles after camera
@@ -36,10 +42,16 @@ public class TileMap {
 	
 	public TileMap(String s){
 		try{
+			
+			spawnX = 1;
+			spawnY = 4;
+			
 			LevelMakerData temp = LevelMakerData.parse(new File("./Resources/Levels/" + s + ".lvmk"));
 			tileMap = temp.getTileMap();
 			
 			tileData = temp.getTileTypes();
+			
+			background = ImageIO.read(new File("./Resources/Backgrounds/" + s + ".png"));
 			
 			rows = tileData.length;
 			cols = tileData[0].length;
@@ -99,10 +111,10 @@ public class TileMap {
 	}
 	
 	public int getTileSize(){ return tileSize; }
-	public int getX(){ return camX; }
-	public int getY(){ return camY; }
-	public int getPlayerSpawnX(){ return spawnX; }
-	public int getPlayerSpawnY(){ return spawnY; }
+	public int getX(){ return (int)camX; }
+	public int getY(){ return (int)camY; }
+	public int getPlayerSpawnX(){ return spawnX * tileSize; }
+	public int getPlayerSpawnY(){ return spawnY * tileSize; }
 	public int getHeight(){ return height; }
 	public int getWidth(){ return width; }
 	public int getRows(){ return rows; }
@@ -113,25 +125,167 @@ public class TileMap {
 	public Tile getTile(int x, int y){ return tiles[y][x]; }
 	//public Enemy getEnemy(int x, int y) return enemySpawns[y][x]; }
 	
+	public void testTouch(Sprite sp){
+		
+		//IT FUCKING WORKS. THANK GOD.
+		
+		int x = sp.getX() / tileSize;
+		int x2 = (sp.getX() + sp.getWidth()) / tileSize;
+		int y = sp.getY() / tileSize;
+		int y2 = (sp.getY() + sp.getHeight()) / tileSize;
+
+		int code = -1;
+		
+		Rectangle rec = new Rectangle(0, 0, 0, 0);
+		
+//		System.out.println(x + ", " + y + " :: " + getTile(x, y).getType());
+		
+		if (getTile(x, y).getType() == Tile.BLOCKING){
+        	int temp = Sprite.isTouching(
+        			new Rectangle(x * tileSize, y*tileSize, tileSize, tileSize),
+        			new Rectangle(sp.getX(), sp.getY(), sp.getWidth(), sp.getHeight())
+        			);
+        	if (temp > code) {
+        		code = temp;
+        		rec = new Rectangle(x * tileSize, y*tileSize, tileSize, tileSize);
+        	}
+        }
+
+//		System.out.println(x2 + ", " + y + " :: " + getTile(x2, y).getType());
+		
+        if (getTile(x2, y).getType() == Tile.BLOCKING){
+        	int temp = Sprite.isTouching(
+        			new Rectangle(x2 * tileSize, y * tileSize, tileSize, tileSize),
+        			new Rectangle(sp.getX(), sp.getY(), sp.getWidth(), sp.getHeight())
+        			);
+        	if (temp > code) {
+        		code = temp;
+        		rec = new Rectangle(x2 * tileSize, y * tileSize, tileSize, tileSize);
+        	}
+        }
+        
+//		System.out.println(x + ", " + y2 + " :: " + getTile(x, y2).getType());
+        
+        if (getTile(x, y2).getType() == Tile.BLOCKING){
+        	int temp = Sprite.isTouching(
+        			new Rectangle(x * tileSize, y2 * tileSize, tileSize, tileSize),
+        			new Rectangle(sp.getX(), sp.getY(), sp.getWidth(), sp.getHeight())
+        			);
+        	if (temp > code) {
+        		code = temp;
+        		rec = new Rectangle(x * tileSize, y2 * tileSize, tileSize, tileSize);
+        	}
+        }
+
+//		System.out.println(x2 + ", " + y2 + " :: " + getTile(x2, y2).getType());
+        
+        if (getTile(x2, y2).getType() == Tile.BLOCKING){
+        	int temp = Sprite.isTouching(
+        			new Rectangle(x2 * tileSize, y2 * tileSize, tileSize, tileSize),
+        			new Rectangle(sp.getX(),sp.getY(), sp.getWidth(), sp.getHeight())
+        			);
+        	if (temp > code) {
+        		code = temp;
+        		rec = new Rectangle(x2 * tileSize, y2 * tileSize, tileSize, tileSize);
+        	}
+        }
+        
+        sp.collide(rec, code);
+	}
+	
+	public void center(double x, double y){
+		camX = x - GamePanel.WIDTH / 2;
+		camY = y - GamePanel.HEIGHT / 2;
+		
+		if (camX < 0) camX = 0;
+//		if (camX > width - GamePanel.WIDTH) x = width - GamePanel.WIDTH;
+		if (camY < 0) camY = 0;
+//		if (camY > height - GamePanel.HEIGHT) y = height - GamePanel.HEIGHT;
+
+		System.out.println("Player :: " + x + ", " + y);
+		System.out.println("Camera :: " + camX + ", " + camY);
+		System.out.println();
+	}
+	
 	public void draw(Graphics2D g){
 	
-		int numRowsToDraw = GamePanel.HEIGHT / tileSize;
-		int numColsToDraw = GamePanel.WIDTH / tileSize;
-		int rowOffset = camY / tileSize;
-		int colOffset = camX / tileSize;
+		int numRowsToDraw = GamePanel.HEIGHT / tileSize + 1;
+		int numColsToDraw = GamePanel.WIDTH / tileSize + 1;
+		int rowOffset = (int)camY / tileSize;
+		int colOffset = (int)camX / tileSize;
 		
-		for(int row = rowOffset; row < rowOffset + numRowsToDraw; row++){
+		BufferedImage cam = new BufferedImage(numColsToDraw * tileSize * GamePanel.SCALE, 
+											  numRowsToDraw * tileSize * GamePanel.SCALE, 
+											  BufferedImage.TYPE_INT_RGB
+											 );
+		
+		Graphics2D camGraphics = (Graphics2D)cam.getGraphics();
+		
+		int draw_x = (int)camX - colOffset * tileSize;
+		int draw_y = (int)camY - rowOffset * tileSize;
+		
+		draw_x *= GamePanel.SCALE;
+		draw_y *= GamePanel.SCALE;
+		
+		System.out.println(numRowsToDraw + ", " + numColsToDraw);
+		System.out.println(draw_x +", " + draw_y +"\n");
+		
+		camGraphics.drawImage(background.getScaledInstance(GamePanel.WIDTH * GamePanel.SCALE, GamePanel.HEIGHT * GamePanel.SCALE, 0), 
+							  draw_x, 
+							  draw_y, 
+							  null
+							 );
+		
+		for (int j = 0; j < numRowsToDraw; j++){
+			int row = rowOffset + j;
 			if (row >= rows) break;
-			for(int col = colOffset; col < colOffset + numColsToDraw; col++){
+			for (int i = 0; i < numColsToDraw; i++){
+				int col = colOffset + i;
 				if (col >= cols) break;
+				
+				String pos = col + ", " + row;
+				
+				while(pos.length() < 7){
+					pos += " ";
+				}
+				
+				pos += ":";
+
+				System.out.print(pos);
+				
 				if (tileData[row][col] == 0) continue;
 				
-				g.drawImage(tiles[row][col].getImage().getScaledInstance(tileSize * GamePanel.SCALE, tileSize * GamePanel.SCALE, 0), 
-						   (int)camX + col * tileSize * GamePanel.SCALE, 
-						   (int)camY + row * tileSize * GamePanel.SCALE, 
-						   null
-						   );
+				camGraphics.drawImage(tiles[row][col].getImage().getScaledInstance(tileSize * GamePanel.SCALE, tileSize * GamePanel.SCALE, 0),
+									  col * tileSize * GamePanel.SCALE,
+									  row * tileSize * GamePanel.SCALE,
+									  null
+									 );
+				
 			}
+			System.out.println();
 		}
+		
+		System.out.println();
+		
+		g.drawImage(cam.getSubimage(draw_x, draw_y, GamePanel.WIDTH * GamePanel.SCALE, GamePanel.HEIGHT * GamePanel.SCALE),
+					0, 
+					0, 
+					null
+					);
+		
+//		for(int row = rowOffset; row < rowOffset + numRowsToDraw; row++){
+//			if (row >= rows) break;
+//			for(int col = colOffset; col < colOffset + numColsToDraw; col++){
+//				if (col >= cols) break;
+//				if (tileData[row][col] == 0) continue;
+//				
+//				g.drawImage(tiles[row][col].getImage().getScaledInstance(tileSize * GamePanel.SCALE, tileSize * GamePanel.SCALE, 0), 
+//						   ((int)camX - col * tileSize) * GamePanel.SCALE, 
+//						   ((int)camY - row * tileSize) * GamePanel.SCALE, 
+//						   null
+//						   );
+//			}
+//		}
+		
 	}
 }
