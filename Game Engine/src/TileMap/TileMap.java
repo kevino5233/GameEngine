@@ -202,17 +202,17 @@ public class TileMap {
 		if (camY < 0) camY = 0;
 //		if (camY > height - GamePanel.HEIGHT) y = height - GamePanel.HEIGHT;
 
-		System.out.println("Player :: " + x + ", " + y);
-		System.out.println("Camera :: " + camX + ", " + camY);
-		System.out.println();
+//		System.out.println("Player :: " + x + ", " + y);
+//		System.out.println("Camera :: " + camX + ", " + camY);
+//		System.out.println();
 	}
 	
 	public void draw(Graphics2D g){
-	
-		int numRowsToDraw = GamePanel.HEIGHT / tileSize + 1;
+
 		int numColsToDraw = GamePanel.WIDTH / tileSize + 1;
-		int rowOffset = (int)camY / tileSize;
+		int numRowsToDraw = GamePanel.HEIGHT / tileSize + 1;
 		int colOffset = (int)camX / tileSize;
+		int rowOffset = (int)camY / tileSize;
 		
 		BufferedImage cam = new BufferedImage(numColsToDraw * tileSize * GamePanel.SCALE, 
 											  numRowsToDraw * tileSize * GamePanel.SCALE, 
@@ -227,14 +227,13 @@ public class TileMap {
 		draw_x *= GamePanel.SCALE;
 		draw_y *= GamePanel.SCALE;
 		
-		System.out.println(numRowsToDraw + ", " + numColsToDraw);
-		System.out.println(draw_x +", " + draw_y +"\n");
-		
 		camGraphics.drawImage(background.getScaledInstance(GamePanel.WIDTH * GamePanel.SCALE, GamePanel.HEIGHT * GamePanel.SCALE, 0), 
 							  draw_x, 
 							  draw_y, 
 							  null
 							 );
+		
+		//FIX THE CAMERA BECAUSE IT SUCKS
 		
 		for (int j = 0; j < numRowsToDraw; j++){
 			int row = rowOffset + j;
@@ -245,27 +244,26 @@ public class TileMap {
 				
 				String pos = col + ", " + row;
 				
-				while(pos.length() < 7){
+				while(pos.length() < 6){
 					pos += " ";
 				}
-				
+				if (col * tileSize >= draw_x && row * tileSize >= draw_y){
+					pos += "d";
+				} else {
+					pos += "n";
+				}
 				pos += ":";
-
-				System.out.print(pos);
 				
 				if (tileData[row][col] == 0) continue;
 				
 				camGraphics.drawImage(tiles[row][col].getImage().getScaledInstance(tileSize * GamePanel.SCALE, tileSize * GamePanel.SCALE, 0),
-									  col * tileSize * GamePanel.SCALE,
-									  row * tileSize * GamePanel.SCALE,
+									  i * tileSize * GamePanel.SCALE,
+									  j * tileSize * GamePanel.SCALE,
 									  null
 									 );
 				
 			}
-			System.out.println();
 		}
-		
-		System.out.println();
 		
 		g.drawImage(cam.getSubimage(draw_x, draw_y, GamePanel.WIDTH * GamePanel.SCALE, GamePanel.HEIGHT * GamePanel.SCALE),
 					0, 

@@ -94,13 +94,18 @@ public class Player extends Sprite{
 		y += dy;
 		x += dx;
 		
+		if (y < 0) {
+			y = 0;
+			snap();
+		}
+		if (x < 0) x = 0;
+		
 		tileMap.testTouch(this);
 		
 	}
 	
 	public void update(){
 		getNextPosition();
-		tileMap.center(x, y);
 		animatino.update();
 		//animation stuff
 	}
@@ -162,6 +167,24 @@ public class Player extends Sprite{
 			else currentState = IDLE;
 		}
 	}
+	
+	private void snap(){
+		dy *= -1;
+		dy /= 3;
+	}
+
+	public void takeDamage(int damage){
+		if (currentState != BLOCKING){
+			health -= damage;
+			if (health < 0){
+				die();
+			}
+		}
+	}
+	
+	private void die(){
+		//stuff stuff game over blah blah animation death
+	}
 
 	public void keyPressed(int k){
 		switch(k){
@@ -208,19 +231,6 @@ public class Player extends Sprite{
 		}
 	}
 	
-	public void takeDamage(int damage){
-		if (currentState != BLOCKING){
-			health -= damage;
-			if (health < 0){
-				die();
-			}
-		}
-	}
-	
-	private void die(){
-		//stuff stuff game over blah blah animation death
-	}
-	
 	public int getX(){ return (int)x; }
 	public int getY(){ return (int)y; }
 	public int getWidth(){ return width; }
@@ -249,8 +259,7 @@ public class Player extends Sprite{
 						}
 						if (y < 0){
 							y = 0;
-							dy *= -1;
-							dy /= 3;
+							snap();
 						}
 						break;
 		case Sprite.DOWN : 

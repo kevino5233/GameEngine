@@ -7,6 +7,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
 
+import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import GameState.GameStateManager;
@@ -69,7 +70,12 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 
 	@Override
 	public void keyPressed(KeyEvent e) {
-		if (e.getKeyCode() == KeyEvent.VK_ESCAPE) running = false;
+		if (e.getKeyCode() == KeyEvent.VK_ESCAPE){
+			if (running){
+				running = false;
+				System.exit(0);
+			}
+		}
 		gsm.keyPressed(e.getKeyCode());
 		
 	}

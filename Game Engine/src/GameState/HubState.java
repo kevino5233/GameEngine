@@ -42,7 +42,10 @@ public class HubState extends GameState{
 
 	@Override
 	public void update() {
-		if (player != null) player.update();
+		if (player != null){
+			player.update();
+			tileMap.center(player.getX(), player.getY());
+		}
 	}
 
 	@Override
