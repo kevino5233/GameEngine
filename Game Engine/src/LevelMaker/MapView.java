@@ -159,10 +159,14 @@ public class MapView extends JComponent implements MouseListener{
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		requestFocusInWindow();
-		palette_panel.setCoordinates(e.getX(), e.getY());
-		palette_frame.pack();
-		palette_frame.setVisible(true);
+		if (e.getButton() == MouseEvent.BUTTON1){
+			requestFocusInWindow();
+			palette_panel.setCoordinates(e.getX(), e.getY());
+			palette_frame.pack();
+			palette_frame.setVisible(true);
+		} else {
+			System.out.println("I can code");
+		}
 	}
 
 	@Override

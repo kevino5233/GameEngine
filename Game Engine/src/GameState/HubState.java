@@ -33,8 +33,8 @@ public class HubState extends GameState{
 		try{
 			tileMap = new TileMap("hub");
 			player = new Player(tileMap, gsm.getFire(), gsm.getAir(), gsm.getDifficulty());
+			player.spawn();
 			bg = ImageIO.read(new File("./Resources/Backgrounds/hub.png"));
-			System.out.println("Done");
 		} catch (Exception e){
 			e.printStackTrace();
 		}
@@ -42,10 +42,12 @@ public class HubState extends GameState{
 
 	@Override
 	public void update() {
-		if (player != null){
+		if (tileMap != null && player != null){
 			player.update();
 			tileMap.center(player.getX(), player.getY());
+			tileMap.update(player);
 		}
+		
 	}
 
 	@Override
@@ -65,35 +67,6 @@ public class HubState extends GameState{
 		} catch (Exception e){
 			e.printStackTrace();
 		}
-		/*
-		 * drawing the player
-		 * //math and stuff to draw the player
-		int x = player.getX();
-		int y = player.getY();
-		//tileMap.center(x, y);
-		int camX = tileMap.getX();
-		int camY = tileMap.getY();
-		
-		int drawX = GamePanel.WIDTH / 2;
-		int drawY = GamePanel.HEIGHT / 2;
-		
-		int maxCamX = tileMap.getCols() - tileMap.getColsAcross();
-		int maxCamY = tileMap.getRows() - tileMap.getRowsAcross();
-		
-		if (camX == 0){
-			drawX = x;
-		} else if (camX == maxCamX){
-			drawX = x - (tileMap.getCols() - tileMap.getColsAcross());
-		}
-		
-		if (camY == 0){
-			drawY = y;
-		} else if (camY == maxCamY){
-			drawY = y - (tileMap.getRows() - tileMap.getRowsAcross());
-		}
-		
-		g.drawImage(player.getCurrentFrame(), drawX, drawY, null);
-		 */
 	}
 
 	@Override

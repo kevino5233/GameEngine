@@ -1,5 +1,6 @@
 package Entity;
 
+import java.awt.Graphics2D;
 import java.awt.Rectangle;
 
 import TileMap.TileMap;
@@ -24,6 +25,7 @@ public abstract class Sprite{
 	protected boolean right;
 	
 	protected int width, height;
+	protected int health, maxHealth;
 	
 	public static final int UP = 1;
 	public static final int DOWN = 2;
@@ -35,7 +37,19 @@ public abstract class Sprite{
     public int getWidth(){ return width; }
     public int getHeight(){ return height;} 
     
+    public void takeDamage(int damage){
+    	health -= damage;
+		if (health < 0){
+			die();
+		}
+	}
+	
+    public abstract void spawn();
+    public abstract void update();
+    public abstract void die();
     public abstract void init();
+    public abstract void draw(Graphics2D g);
+    
     public abstract void collide(Rectangle rec, int code);
     
     public Sprite(TileMap tm){
@@ -44,9 +58,6 @@ public abstract class Sprite{
     }
     
     public static int isTouching(Rectangle a, Rectangle b){
-    	
-    	System.out.println("Tile :: " + a.getX() + ", " + a.getY());
-		System.out.println("Player :: " + b.getX() + ", " + b.getY());
     	
         double x = a.getX();
         double x2 = x + a.getWidth();
@@ -69,20 +80,15 @@ public abstract class Sprite{
 		double y2_j2 = Math.abs(y2 - j2);
 		
         if (y <= j2 && y > j && ((i >= x && i2 <= x2) || (i2 > x && i < x) || (i < x2 && i2 > x2)) && (j_y > y_j2 && i_x <= x_i2 && i_x2 >= x2_i2)){
-        	System.out.println("UP");
         	return UP;
 		} else if (j < y2 && j2 > y2 && ((i >= x && i2 <= x2) || (i2 > x && i < x) || (i < x2 && i2 > x2)) && ( j_y2 < y2_j2)){
-			System.out.println("DOWN");
 			return DOWN;
 		} else if (i2 > x && i < x && ((j >= y && j2 <= y2) || (j2 > y && j < y) || (j < y2 && j2 > y2)) && ( i_x > x_i2)) {
-			System.out.println("LEFT");
 			return LEFT;
 		} else if (i > x && i < x2 && ((j >= y && j2 <= y2) || (j2 > y && j < y) || (j < y2 && j2 > y2)) && ( (i_x2 < x2_i2))){
-			System.out.println("RIGHT");
 			return RIGHT;
 		}
-        System.out.println("NOPE");
-		return -1;
+        return -1;
     }
 }
 

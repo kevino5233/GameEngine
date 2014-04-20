@@ -1,14 +1,16 @@
 package TileMap;
 
-import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
-import javax.swing.JFrame;
 
+import Entity.Bat;
+import Entity.Enemy;
+import Entity.Player;
 import Entity.Sprite;
 import LevelMaker.LevelMakerData;
 import Main.GamePanel;
@@ -28,7 +30,7 @@ public class TileMap {
 	
 	private int numTilesAcross;
 	
-	private BufferedImage tileMap, background;
+	private BufferedImage tileMap, background, frame;
 	
 //	spawn enemies 3 tiles before camera
 //	despawn enemies 10 tiles after camera
@@ -36,6 +38,8 @@ public class TileMap {
 //	private SpawnListener spawnListener;
 //	
 //	private Enemy[][] enemySpawns;
+	
+	private ArrayList<Enemy> liveEnemies;
 	
 	private int[][] tileData;
 	private Tile[][] tiles;
@@ -74,6 +78,12 @@ public class TileMap {
 															   type / w);
 				}
 			}
+			
+			frame = new BufferedImage(GamePanel.WIDTH * GamePanel.SCALE, GamePanel.HEIGHT * GamePanel.SCALE, BufferedImage.TYPE_INT_RGB);
+			
+			liveEnemies = new ArrayList<Enemy>();
+			liveEnemies.add(new Bat(this, 5 * tileSize, 5 * tileSize));
+			liveEnemies.add(new Bat(this, 4 * tileSize, 4 * tileSize));
 			
 			//File[] sheets = (new File("./Resources/Sprites/Enemies/" + s)).listFiles();
 			
@@ -128,6 +138,7 @@ public class TileMap {
 	public void testTouch(Sprite sp){
 		
 		//IT FUCKING WORKS. THANK GOD.
+		//JK CAN'T LAND BETWEEN PLATFORMS GGGGGG
 		
 		int x = sp.getX() / tileSize;
 		int x2 = (sp.getX() + sp.getWidth()) / tileSize;
@@ -137,8 +148,6 @@ public class TileMap {
 		int code = -1;
 		
 		Rectangle rec = new Rectangle(0, 0, 0, 0);
-		
-//		System.out.println(x + ", " + y + " :: " + getTile(x, y).getType());
 		
 		if (getTile(x, y).getType() == Tile.BLOCKING){
         	int temp = Sprite.isTouching(
@@ -150,10 +159,8 @@ public class TileMap {
         		rec = new Rectangle(x * tileSize, y*tileSize, tileSize, tileSize);
         	}
         }
-
-//		System.out.println(x2 + ", " + y + " :: " + getTile(x2, y).getType());
 		
-        if (getTile(x2, y).getType() == Tile.BLOCKING){
+        if (x2 < getCols() && getTile(x2, y).getType() == Tile.BLOCKING){
         	int temp = Sprite.isTouching(
         			new Rectangle(x2 * tileSize, y * tileSize, tileSize, tileSize),
         			new Rectangle(sp.getX(), sp.getY(), sp.getWidth(), sp.getHeight())
@@ -164,9 +171,7 @@ public class TileMap {
         	}
         }
         
-//		System.out.println(x + ", " + y2 + " :: " + getTile(x, y2).getType());
-        
-        if (getTile(x, y2).getType() == Tile.BLOCKING){
+        if (y2 < getRows() && getTile(x, y2).getType() == Tile.BLOCKING){
         	int temp = Sprite.isTouching(
         			new Rectangle(x * tileSize, y2 * tileSize, tileSize, tileSize),
         			new Rectangle(sp.getX(), sp.getY(), sp.getWidth(), sp.getHeight())
@@ -177,9 +182,7 @@ public class TileMap {
         	}
         }
 
-//		System.out.println(x2 + ", " + y2 + " :: " + getTile(x2, y2).getType());
-        
-        if (getTile(x2, y2).getType() == Tile.BLOCKING){
+        if (x2 < getCols() && y2 < getRows() && getTile(x2, y2).getType() == Tile.BLOCKING){
         	int temp = Sprite.isTouching(
         			new Rectangle(x2 * tileSize, y2 * tileSize, tileSize, tileSize),
         			new Rectangle(sp.getX(),sp.getY(), sp.getWidth(), sp.getHeight())
@@ -198,17 +201,13 @@ public class TileMap {
 		camY = y - GamePanel.HEIGHT / 2;
 		
 		if (camX < 0) camX = 0;
-//		if (camX > width - GamePanel.WIDTH) x = width - GamePanel.WIDTH;
+		if (camX > width - GamePanel.WIDTH) camX = width - GamePanel.WIDTH;
 		if (camY < 0) camY = 0;
-//		if (camY > height - GamePanel.HEIGHT) y = height - GamePanel.HEIGHT;
+		if (camY > height - GamePanel.HEIGHT) camY = height - GamePanel.HEIGHT;
 
-//		System.out.println("Player :: " + x + ", " + y);
-//		System.out.println("Camera :: " + camX + ", " + camY);
-//		System.out.println();
 	}
 	
-	public void draw(Graphics2D g){
-
+	public void update(Player player){
 		int numColsToDraw = GamePanel.WIDTH / tileSize + 1;
 		int numRowsToDraw = GamePanel.HEIGHT / tileSize + 1;
 		int colOffset = (int)camX / tileSize;
@@ -233,27 +232,12 @@ public class TileMap {
 							  null
 							 );
 		
-		//FIX THE CAMERA BECAUSE IT SUCKS
-		
 		for (int j = 0; j < numRowsToDraw; j++){
 			int row = rowOffset + j;
 			if (row >= rows) break;
 			for (int i = 0; i < numColsToDraw; i++){
 				int col = colOffset + i;
 				if (col >= cols) break;
-				
-				String pos = col + ", " + row;
-				
-				while(pos.length() < 6){
-					pos += " ";
-				}
-				if (col * tileSize >= draw_x && row * tileSize >= draw_y){
-					pos += "d";
-				} else {
-					pos += "n";
-				}
-				pos += ":";
-				
 				if (tileData[row][col] == 0) continue;
 				
 				camGraphics.drawImage(tiles[row][col].getImage().getScaledInstance(tileSize * GamePanel.SCALE, tileSize * GamePanel.SCALE, 0),
@@ -265,25 +249,41 @@ public class TileMap {
 			}
 		}
 		
-		g.drawImage(cam.getSubimage(draw_x, draw_y, GamePanel.WIDTH * GamePanel.SCALE, GamePanel.HEIGHT * GamePanel.SCALE),
+		frame.getGraphics().drawImage(cam.getSubimage(draw_x, draw_y, GamePanel.WIDTH * GamePanel.SCALE, GamePanel.HEIGHT * GamePanel.SCALE),
+									  0,
+									  0,
+									  null
+									 );
+		
+		for (int i = 0; i < liveEnemies.size(); i++){
+			Enemy e = liveEnemies.get(i);
+			if (e == null) continue;
+			//fix the ranges to allow for one tile outlier?
+			if (e.getX() + e.getWidth() < camX ||
+				e.getX() > camX + GamePanel.WIDTH || 
+				e.getY() + e.getHeight() < camY || 
+				e.getY() > camY + GamePanel.HEIGHT){
+				e.die();
+				liveEnemies.remove(i);
+			} else {
+				e.getNextPosition(player);
+				e.update();
+			}
+		}
+	}
+	
+	public void draw(Graphics2D g){
+
+		g.drawImage(frame,
 					0, 
 					0, 
 					null
 					);
 		
-//		for(int row = rowOffset; row < rowOffset + numRowsToDraw; row++){
-//			if (row >= rows) break;
-//			for(int col = colOffset; col < colOffset + numColsToDraw; col++){
-//				if (col >= cols) break;
-//				if (tileData[row][col] == 0) continue;
-//				
-//				g.drawImage(tiles[row][col].getImage().getScaledInstance(tileSize * GamePanel.SCALE, tileSize * GamePanel.SCALE, 0), 
-//						   ((int)camX - col * tileSize) * GamePanel.SCALE, 
-//						   ((int)camY - row * tileSize) * GamePanel.SCALE, 
-//						   null
-//						   );
-//			}
-//		}
+		for (Enemy e : liveEnemies){
+			e.draw(g);
+		}
+		
 		
 	}
 }
