@@ -16,39 +16,52 @@ import javax.swing.JFrame;
 
 public class MapView extends JComponent implements MouseListener{
 
-	private BufferedImage za_bokusu;
+	private BufferedImage zaBokusu;
 	
 	private static final int SIDE = 600;
 	
-	private static int res_num = 2;
-	private static final int[] tiles_across = {10, 20, 40, 60, 100};
+	private static int resNum = 2;
+	private static final int[] tilesAcross = {10, 20, 40, 60, 100};
 	
-	private JFrame palette_frame;
-	private PalettePanel palette_panel;
+	private JFrame paletteFrame;
+	private TilePalettePanel palettePanel;
+	
+	private JFrame enemyFrame;
+	private EnemyPalettePanel enemyPanel;
 	
 	private BufferedImage tile_map;
 	
 	private BufferedImage[][] tiles;
 	private int[][] level_data;
 	
-	private int cam_x, cam_y;
+	private int camX, camY;
 	
 	public MapView(){
 		setFocusable(true);
 		setPreferredSize(new Dimension(SIDE, SIDE));
-		tiles = new BufferedImage[tiles_across[res_num]][tiles_across[res_num]];
-		level_data = new int[tiles_across[res_num]][tiles_across[res_num]];
-		cam_x = 0;
-		cam_y = 0;
+		
+		tiles = new BufferedImage[tilesAcross[resNum]][tilesAcross[resNum]];
+		level_data = new int[tilesAcross[resNum]][tilesAcross[resNum]];
+		
+		camX = 0;
+		camY = 0;
+		
 		addMouseListener(this);
+		
 		repaint();
-		palette_panel = new PalettePanel(this);
-		palette_frame = new JFrame("Select Tile");
-		palette_frame.setContentPane(palette_panel);
-	    palette_frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
-		palette_frame.setResizable(false);
+		
+		palettePanel = new TilePalettePanel(this);
+		paletteFrame = new JFrame("Select Tile");
+		paletteFrame.setContentPane(palettePanel);
+	    
+		enemyPanel = new EnemyPalettePanel(this);
+		enemyFrame = new JFrame("Select Enemy");
+		enemyFrame.setContentPane(palettePanel);
+		
+		paletteFrame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+		paletteFrame.setResizable(false);
 		try {
-			za_bokusu = ImageIO.read(new File("./Resources/ZA_BOX.png"));
+			zaBokusu = ImageIO.read(new File("./Resources/ZA_BOX.png"));
 		} catch (IOException e) {
 			System.out.println("Could not load grid");
 		}
@@ -56,12 +69,12 @@ public class MapView extends JComponent implements MouseListener{
 	
 	public void addTile(BufferedImage tile, int tile_num, int x, int y){
 
-		palette_frame.setVisible(false);
+		paletteFrame.setVisible(false);
 		
-		int res = SIDE / tiles_across[res_num];
+		int res = SIDE / tilesAcross[resNum];
 		
-		x = (x + cam_x) / res;
-		y = (y + cam_x) / res;
+		x = (x + camX) / res;
+		y = (y + camX) / res;
 		
 		tiles[y][x] = tile;
 		level_data[y][x] = tile_num;
@@ -71,19 +84,19 @@ public class MapView extends JComponent implements MouseListener{
 	}
 	
 	private BufferedImage currentFrame(){
-		int res = SIDE / tiles_across[res_num];
+		int res = SIDE / tilesAcross[resNum];
 		BufferedImage level_view = new BufferedImage(SIDE, SIDE, BufferedImage.TYPE_INT_RGB);
 		Graphics2D g = (Graphics2D) level_view.getGraphics();
-		for (int j = 0; j < tiles_across[res_num] && j < level_data.length; j++){
-			for (int i = 0; i < tiles_across[res_num] && i < level_data[0].length; i++){
+		for (int j = 0; j < tilesAcross[resNum] && j < level_data.length; j++){
+			for (int i = 0; i < tilesAcross[resNum] && i < level_data[0].length; i++){
 				
-				if (level_data[j + cam_y][i + cam_x] != 0){
-					System.out.println(level_data[j + cam_y][i + cam_x]);
-					Image temp = tiles[j + cam_y][i + cam_x].getScaledInstance(res, res, Image.SCALE_DEFAULT);
+				if (level_data[j + camY][i + camX] != 0){
+					System.out.println(level_data[j + camY][i + camX]);
+					Image temp = tiles[j + camY][i + camX].getScaledInstance(res, res, Image.SCALE_DEFAULT);
 					g.drawImage(temp, i * res, j * res, null);
 				} else {
 					g.drawImage(
-							za_bokusu.getScaledInstance(res, res, Image.SCALE_DEFAULT), 
+							zaBokusu.getScaledInstance(res, res, Image.SCALE_DEFAULT), 
 							i * res, 
 							j * res, 
 							null
@@ -108,7 +121,7 @@ public class MapView extends JComponent implements MouseListener{
 		tile_map = lvmk.getTileMap();
 		level_data = lvmk.getTileTypes();
 		tiles = new BufferedImage[level_data.length][level_data[0].length];
-		palette_panel.setMap(tile_map, 16);
+		palettePanel.setMap(tile_map, 16);
 		int tiles_vertically_across = tile_map.getHeight() / 16;
 		int tiles_horizontally_across = tile_map.getWidth() / 16;
 		for (int j = 0; j < level_data.length; j++){
@@ -126,34 +139,34 @@ public class MapView extends JComponent implements MouseListener{
 	}
 	
 	public void zoomOut(){
-		res_num++;
-		if (res_num >= tiles_across.length) res_num = tiles_across.length - 1;
+		resNum++;
+		if (resNum >= tilesAcross.length) resNum = tilesAcross.length - 1;
 		repaint();
 	}
 	
 	public void zoomIn(){
-		res_num--;
-		if (res_num < 0) res_num = 0;
+		resNum--;
+		if (resNum < 0) resNum = 0;
 		repaint();
 	}
 	
 	public void moveRight(){
-		if (++cam_x + tiles_across[res_num] >= level_data[0].length) --cam_x;
+		if (++camX + tilesAcross[resNum] >= level_data[0].length) --camX;
 		repaint();
 	}
 	
 	public void moveLeft(){
-		if (--cam_x < 0) cam_x = 0;
+		if (--camX < 0) camX = 0;
 		repaint();
 	}
 	
 	public void moveUp(){
-		if (--cam_y < 0) cam_y = 0;
+		if (--camY < 0) camY = 0;
 		repaint();
 	}
 	
 	public void moveDown(){
-		if (++cam_y + tiles_across[res_num] >= level_data.length) --cam_y;
+		if (++camY + tilesAcross[resNum] >= level_data.length) --camY;
 		repaint();
 	}
 
@@ -161,11 +174,14 @@ public class MapView extends JComponent implements MouseListener{
 	public void mouseClicked(MouseEvent e) {
 		if (e.getButton() == MouseEvent.BUTTON1){
 			requestFocusInWindow();
-			palette_panel.setCoordinates(e.getX(), e.getY());
-			palette_frame.pack();
-			palette_frame.setVisible(true);
+			palettePanel.setCoordinates(e.getX(), e.getY());
+			paletteFrame.pack();
+			paletteFrame.setVisible(true);
 		} else {
-			System.out.println("I can code");
+			requestFocusInWindow();
+			//enemyPanel.setCoordinates(e.getX(), e.getY());
+			enemyFrame.pack();
+			enemyFrame.setVisible(true);
 		}
 	}
 
