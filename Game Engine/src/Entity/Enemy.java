@@ -4,7 +4,9 @@ import TileMap.TileMap;
 
 public abstract class Enemy extends Sprite{
 	
-	double spawnX, spawnY;
+	private boolean active;
+	
+	protected double spawnX, spawnY;
 
 	public Enemy(TileMap tm) {
 		super(tm);
@@ -18,6 +20,8 @@ public abstract class Enemy extends Sprite{
 		this.x = spawnX = x;
 		this.y = spawnY = y;
 	}
+	
+	public boolean isActive(){ return active; }
 	
 	public double distance(Sprite sp){
 		int x2 = sp.getX();

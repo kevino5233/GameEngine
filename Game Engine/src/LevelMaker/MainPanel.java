@@ -12,23 +12,24 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 public class MainPanel extends JPanel implements ActionListener{
 
-	private JFileChooser file_chooser;
+	private JFileChooser fileChooser;
 	
-	private OptionsFrame options_frame;
+	private OptionsFrame optionsFrame;
 	
 	private static final FileNameExtensionFilter LVMK = new FileNameExtensionFilter("Level Maker Files (.lvmk)", "lvmk");
 	private static final FileNameExtensionFilter IMAGES = new FileNameExtensionFilter("Images (.PNG, .JPG, .JPEG, .GIF, .BMP)", "jpg", "jpeg", "gif", "png", "bmp");
 	
 	private JButton options_button;
-	private JButton open_level_button;
-	private JButton save_level_button;
+	private JButton openLevelButton;
+	private JButton saveLevelButton;
 	
-	private JButton zoom_in_button;
-	private JButton zoom_out_button;
-	private JButton left_button;
-	private JButton right_button;
-	private JButton up_button;
-	private JButton down_button;
+	private JButton zoomInButton;
+	private JButton zoomOutButton;
+	private JButton leftButton;
+	private JButton rightButton;
+	private JButton upButton;
+	private JButton downButton;
+	private JButton seeEnemiesButton;
 	
 	private MapView map;
 	
@@ -38,50 +39,53 @@ public class MainPanel extends JPanel implements ActionListener{
 		layout.setAutoCreateContainerGaps(true);
 		setLayout(layout);
 		
-		file_chooser = new JFileChooser(System.getProperty("user.home"));
-		file_chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+		fileChooser = new JFileChooser(System.getProperty("user.home"));
+		fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 		
 		map = new MapView();
 
-		options_frame = new OptionsFrame(this);
+		optionsFrame = new OptionsFrame(this);
 		
-		open_level_button = new JButton("Open Level");
-		save_level_button = new JButton("Save Level");
+		openLevelButton = new JButton("Open Level");
+		saveLevelButton = new JButton("Save Level");
 		options_button = new JButton("Options");
 		
-		zoom_in_button = new JButton("+");
-		zoom_out_button = new JButton("-");
-		left_button = new JButton("<");
-		right_button = new JButton(">");
-		up_button = new JButton("^");
-		down_button = new JButton("V");
+		zoomInButton = new JButton("+");
+		zoomOutButton = new JButton("-");
+		leftButton = new JButton("<");
+		rightButton = new JButton(">");
+		upButton = new JButton("^");
+		downButton = new JButton("V");
+		seeEnemiesButton = new JButton("See Enemies");
 
-		open_level_button.addActionListener(this);
-		save_level_button.addActionListener(this);
+		openLevelButton.addActionListener(this);
+		saveLevelButton.addActionListener(this);
 		options_button.addActionListener(this);
 		
-		zoom_in_button.addActionListener(this);
-		zoom_out_button.addActionListener(this);
-		left_button.addActionListener(this);
-		right_button.addActionListener(this);
-		up_button.addActionListener(this);
-		down_button.addActionListener(this);
+		zoomInButton.addActionListener(this);
+		zoomOutButton.addActionListener(this);
+		leftButton.addActionListener(this);
+		rightButton.addActionListener(this);
+		upButton.addActionListener(this);
+		downButton.addActionListener(this);
+		seeEnemiesButton.addActionListener(this);
 		
 		layout.setHorizontalGroup(
 			layout.createSequentialGroup()
 				.addGroup(layout.createParallelGroup()
 						.addGroup(layout.createSequentialGroup()
-								.addComponent(open_level_button)
-								.addComponent(save_level_button)
+								.addComponent(openLevelButton)
+								.addComponent(saveLevelButton)
 								.addComponent(options_button)
 						)
 						.addGroup(layout.createSequentialGroup()
-								.addComponent(zoom_in_button)
-								.addComponent(zoom_out_button)
-								.addComponent(left_button)
-								.addComponent(right_button)
-								.addComponent(up_button)
-								.addComponent(down_button)
+								.addComponent(zoomInButton)
+								.addComponent(zoomOutButton)
+								.addComponent(leftButton)
+								.addComponent(rightButton)
+								.addComponent(upButton)
+								.addComponent(downButton)
+								.addComponent(seeEnemiesButton)
 						)
 						.addComponent(map)
 				)
@@ -90,17 +94,18 @@ public class MainPanel extends JPanel implements ActionListener{
 		layout.setVerticalGroup(
 			layout.createSequentialGroup()
 				.addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-						.addComponent(open_level_button)
-						.addComponent(save_level_button)
+						.addComponent(openLevelButton)
+						.addComponent(saveLevelButton)
 						.addComponent(options_button)
 				)
 				.addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-						.addComponent(zoom_in_button)
-						.addComponent(zoom_out_button)
-						.addComponent(left_button)
-						.addComponent(right_button)
-						.addComponent(up_button)
-						.addComponent(down_button)
+						.addComponent(zoomInButton)
+						.addComponent(zoomOutButton)
+						.addComponent(leftButton)
+						.addComponent(rightButton)
+						.addComponent(upButton)
+						.addComponent(downButton)
+						.addComponent(seeEnemiesButton)
 				)
 				.addComponent(map)
 		);
@@ -108,51 +113,51 @@ public class MainPanel extends JPanel implements ActionListener{
 	
 	public void setLevel(LevelMakerData lvmk){
 		map.load(lvmk);
-		options_frame.setVisible(false);
+		optionsFrame.setVisible(false);
 	}
 	
 	@Override
 	public void actionPerformed(ActionEvent e) {
 
-		file_chooser.resetChoosableFileFilters();
-		file_chooser.setFileFilter(IMAGES);
+		fileChooser.resetChoosableFileFilters();
+		fileChooser.setFileFilter(IMAGES);
 		
 		int return_val;
 		
 		if (e.getSource() == options_button){
 			
-			options_frame.pack();
-			options_frame.setVisible(true);
+			optionsFrame.pack();
+			optionsFrame.setVisible(true);
 			
-		} else if (e.getSource() == open_level_button){
+		} else if (e.getSource() == openLevelButton){
 			
-			file_chooser.resetChoosableFileFilters();
-			file_chooser.setFileFilter(LVMK);
+			fileChooser.resetChoosableFileFilters();
+			fileChooser.setFileFilter(LVMK);
 			
-			return_val = file_chooser.showOpenDialog(this);
+			return_val = fileChooser.showOpenDialog(this);
 			
 			if (return_val == JFileChooser.APPROVE_OPTION){
 				try{
 					
 					
-					map.load(LevelMakerData.parse(file_chooser.getSelectedFile()));
+					map.load(LevelMakerData.parse(fileChooser.getSelectedFile()));
 					
 				} catch (IOException exception){
 					System.out.println("Error while loading file");
 				}
 			}
 			
-		} else if (e.getSource() == save_level_button){
+		} else if (e.getSource() == saveLevelButton){
 
-			file_chooser.resetChoosableFileFilters();
-			file_chooser.setFileFilter(LVMK);
+			fileChooser.resetChoosableFileFilters();
+			fileChooser.setFileFilter(LVMK);
 			
-			return_val = file_chooser.showSaveDialog(this);
+			return_val = fileChooser.showSaveDialog(this);
 			
 			if (return_val == JFileChooser.APPROVE_OPTION){
 				try{
 					
-					String path = file_chooser.getSelectedFile().getAbsolutePath();
+					String path = fileChooser.getSelectedFile().getAbsolutePath();
 					path += ".lvmk";
 					File file = new File(path);
 					if (!file.exists()){
@@ -166,18 +171,20 @@ public class MainPanel extends JPanel implements ActionListener{
 				}
 			}
 			
-		} else if (e.getSource() == zoom_in_button){
+		} else if (e.getSource() == zoomInButton){
 			map.zoomIn();
-		} else if (e.getSource() == zoom_out_button){
+		} else if (e.getSource() == zoomOutButton){
 			map.zoomOut();
-		} else if (e.getSource() == up_button){
+		} else if (e.getSource() == upButton){
 			map.moveUp();
-		} else if (e.getSource() == down_button){
+		} else if (e.getSource() == downButton){
 			map.moveDown();
-		} else if (e.getSource() == left_button){
+		} else if (e.getSource() == leftButton){
 			map.moveLeft();
-		} else if (e.getSource() == right_button){
+		} else if (e.getSource() == rightButton){
 			map.moveRight();
+		} else if (e.getSource() == seeEnemiesButton){
+			map.toggleEnemyDisplay();
 		}
 	}
 	

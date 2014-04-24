@@ -163,7 +163,7 @@ public class Bat extends Enemy{
 
 	@Override
 	public void die() {
-		
+		active = false;
 	}
 
 	@Override

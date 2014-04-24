@@ -120,8 +120,7 @@ public class OptionsFrame extends JFrame implements ActionListener{
 		} else if (source == make_button){
 			
 			try{
-				int[][] tile_types = new int[Integer.parseInt(y_text_field.getText())][Integer.parseInt(x_text_field.getText())];
-				parent.setLevel(LevelMakerData.getLevelMakerData(tile_map, tile_types));
+				parent.setLevel(LevelMakerData.getLevelMakerData(tile_map, Integer.parseInt(y_text_field.getText()), Integer.parseInt(x_text_field.getText())));
 			} catch (NullPointerException e){
 				System.out.println("You did not fill out all the fields!");
 			} catch (NumberFormatException e){

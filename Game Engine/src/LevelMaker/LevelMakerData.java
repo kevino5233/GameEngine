@@ -9,39 +9,59 @@ import java.util.Scanner;
 
 public class LevelMakerData {
 
-	private BufferedImage tile_map;
+	private BufferedImage tileMap;
 	
-	private int[][] tile_types;
+	private int[][] tileTypes;
 	
-	private LevelMakerData(BufferedImage tm, int[][] tt){
-		tile_map = tm;
-		tile_types = tt;
+	private String[][] enemyData;
+	
+	private LevelMakerData(BufferedImage tm, int[][] tt, String[][] ed){
+		tileMap = tm;
+		tileTypes = tt;
+		enemyData = ed;
 	}
 	
-	public BufferedImage getTileMap(){ return tile_map; }
-	public int[][] getTileTypes(){ return tile_types; }
+	public BufferedImage getTileMap(){ return tileMap; }
+	public int[][] getTileTypes(){ return tileTypes; }
+	public String[][] getEnemyData(){ return enemyData; }
 	
-	public static String getSaveableData(BufferedImage tile_map, int[][] tile_types){
+	public static String getSaveableData(BufferedImage tileMap, int[][] tileTypes, String[][] enemyData){
 		String contents = "";
-		contents += String.format("%d %d\n", tile_map.getHeight(), tile_map.getWidth());
-		for (int j = 0; j < tile_map.getHeight(); j++){
-			for (int i = 0; i < tile_map.getWidth(); i++){
-				contents += tile_map.getRGB(i, j) + " ";
+		contents += String.format("%d %d\n", tileMap.getHeight(), tileMap.getWidth());
+		for (int j = 0; j < tileMap.getHeight(); j++){
+			for (int i = 0; i < tileMap.getWidth(); i++){
+				contents += tileMap.getRGB(i, j) + " ";
 			}
 			contents += '\n';
 		}
-		contents += String.format("%d %d\n", tile_types.length, tile_types[0].length);
-		for (int j = 0; j < tile_types.length; j++){
-			for (int i = 0; i < tile_types[0].length; i++){
-				contents += tile_types[j][i] + " ";
+		contents += String.format("%d %d\n", tileTypes.length, tileTypes[0].length);
+		for (int j = 0; j < tileTypes.length; j++){
+			for (int i = 0; i < tileTypes[0].length; i++){
+				contents += tileTypes[j][i] + " ";
+			}
+			contents += '\n';
+		}
+		for (int j = 0; j < tileTypes.length; j++){
+			for (int i = 0; i < tileTypes[0].length; i++){
+				contents += tileTypes[j][i] + " ";
+			}
+			contents += '\n';
+		}
+		for (int j = 0; j < enemyData.length; j++){
+			for (int i = 0; i < enemyData[0].length; i++){
+				if (enemyData[j][i] == null){
+					contents += "None ";
+				} else {
+					contents += enemyData[j][i];
+				}
 			}
 			contents += '\n';
 		}
 		return contents;
 	}
 	
-	public static LevelMakerData getLevelMakerData(BufferedImage tile_map, int[][] tile_types){
-		return new LevelMakerData(tile_map, tile_types);
+	public static LevelMakerData getLevelMakerData(BufferedImage tileMap, int cols, int rows){
+		return new LevelMakerData(tileMap, new int[rows][cols], new String[rows][cols]);
 	}
 	
 	public static LevelMakerData parse(File f)throws IOException{
@@ -60,7 +80,14 @@ public class LevelMakerData {
 				tt[j][i] = in.nextInt();
 			}
 		}
-		return new LevelMakerData(tm, tt);
+		String[][] ed = new String[tt.length][tt[0].length];
+		for (int j = 0; j < tt.length; j++){
+			for (int i = 0; i < tt[0].length; i++){
+				ed[j][i] = in.next();
+			}
+		}
+		in.close();
+		return new LevelMakerData(tm, tt, ed);
 	}
 	
 }

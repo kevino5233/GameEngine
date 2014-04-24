@@ -44,6 +44,8 @@ public class TileMap {
 	private int[][] tileData;
 	private Tile[][] tiles;
 	
+	private Enemy[][] enemyData;
+	
 	public TileMap(String s){
 		try{
 			
@@ -51,9 +53,13 @@ public class TileMap {
 			spawnY = 4;
 			
 			LevelMakerData temp = LevelMakerData.parse(new File("./Resources/Levels/" + s + ".lvmk"));
+			
 			tileMap = temp.getTileMap();
 			
 			tileData = temp.getTileTypes();
+			
+			String[][] enemyNames = temp.getEnemyData();
+			enemyData = new Enemy[enemyNames.length][enemyNames[0].length];
 			
 			background = ImageIO.read(new File("./Resources/Backgrounds/" + s + ".png"));
 			
@@ -79,41 +85,24 @@ public class TileMap {
 				}
 			}
 			
+			for (int j = 0; j < enemyNames.length; j++){
+				for (int i = 0; i < enemyNames[0].length; i++){
+					switch(enemyNames[j][i]){
+					case "None" : continue;
+					case "Bat" : 
+						enemyData[j][i] = new Bat(this, i * tileSize, j * tileSize); 
+						break;
+					}
+				}
+			}
+			
 			frame = new BufferedImage(GamePanel.WIDTH * GamePanel.SCALE, GamePanel.HEIGHT * GamePanel.SCALE, BufferedImage.TYPE_INT_RGB);
 			
 			liveEnemies = new ArrayList<Enemy>();
 			liveEnemies.add(new Bat(this, 5 * tileSize, 5 * tileSize));
 			liveEnemies.add(new Bat(this, 4 * tileSize, 4 * tileSize));
 			
-			//File[] sheets = (new File("./Resources/Sprites/Enemies/" + s)).listFiles();
 			
-			/*
-			 * 
-			int[][] spawnData = temp.getSpawns();
-			Enemy[] enemies = new Enemies[sheets.length];
-			
-			for (int x = 0; x < sheets.length; x++){
-				//we need a way to differentiate the different enemies
-				enemies[x] = new Enemy(sheets[x]);
-			}
-			
-			for (int j = 0; j < spawnData.length; j++){
-				for (int i = 0; i < spawnData[0].length; i++){
-					if (spawnData[j][i] == -1){
-						spawnX = i;
-						spawnY = j;
-					} else if (spawnData[j][i] == 0){
-						enemySpawns[j][i] = null;
-					} else {
-						enemySpawns[j][i] = enemies[spawnData[j][i]];
-					}
-				}
-			}
-			spawnListener = new SpawnListener(enemySpawns);
-			
-			//somehow instantiate rowOffSet and colOffSet
-			 * 
-			 */
 		} catch (Exception e){
 			System.out.println("You dunn fucked up");
 			e.printStackTrace();
@@ -240,6 +229,13 @@ public class TileMap {
 				if (col >= cols) break;
 				if (tileData[row][col] == 0) continue;
 				
+				if (enemyData[row][col] != null){
+					Enemy e = enemyData[row][col];
+					if (!e.isActive()){
+						liveEnemies.add(e);
+					}
+				}
+				
 				camGraphics.drawImage(tiles[row][col].getImage().getScaledInstance(tileSize * GamePanel.SCALE, tileSize * GamePanel.SCALE, 0),
 									  i * tileSize * GamePanel.SCALE,
 									  j * tileSize * GamePanel.SCALE,
@@ -255,11 +251,14 @@ public class TileMap {
 									  null
 									 );
 		
+		//keep working on this
+		
 		for (int i = 0; i < liveEnemies.size(); i++){
 			Enemy e = liveEnemies.get(i);
 			if (e == null) continue;
 			//fix the ranges to allow for one tile outlier?
-			if (e.getX() + e.getWidth() < camX ||
+			if (!e.isActive() ||
+				e.getX() + e.getWidth() < camX ||
 				e.getX() > camX + GamePanel.WIDTH || 
 				e.getY() + e.getHeight() < camY || 
 				e.getY() > camY + GamePanel.HEIGHT){

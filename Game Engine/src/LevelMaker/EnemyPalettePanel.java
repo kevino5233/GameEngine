@@ -10,12 +10,18 @@ import javax.swing.JPanel;
 
 public class EnemyPalettePanel extends JPanel implements ActionListener{
 	
+	private JButton playerSpawnButton;
+	
 	private JButton[][] enemyButtons;
 	
 	private MapView mapView;
 	
+	private int x, y;
+	
 	public EnemyPalettePanel(MapView parent){
 		mapView = parent;
+		
+		playerSpawnButton = new JButton("Player Spawn");
 		
 		enemyButtons = new JButton[2][];
 		
@@ -44,11 +50,10 @@ public class EnemyPalettePanel extends JPanel implements ActionListener{
 		JLabel fireLabel = new JLabel("Fire Enemies");
 		JLabel earthLabel = new JLabel("Earth Enemies");
 		
-		//fix
-		
 		layout.setHorizontalGroup(
 			layout.createSequentialGroup()
 				.addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+					.addComponent(playerSpawnButton)
 					.addComponent(fireLabel)
 					.addComponent(enemyButtons[0][0])
 					.addComponent(earthLabel)
@@ -67,6 +72,7 @@ public class EnemyPalettePanel extends JPanel implements ActionListener{
 		
 		layout.setVerticalGroup(
 			layout.createSequentialGroup()
+				.addComponent(playerSpawnButton)
 				.addComponent(fireLabel)
 				.addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
 					.addComponent(enemyButtons[0][0])
@@ -84,11 +90,16 @@ public class EnemyPalettePanel extends JPanel implements ActionListener{
 		
 		
 	}
+	
+	public void setCoordinates(int x, int y){
+		this.x = x;
+		this.y = y;
+	}
 
 	@Override
-	public void actionPerformed(ActionEvent e) {
-		// TODO Auto-generated method stub
-		
+	public void actionPerformed(ActionEvent ae) {
+		JButton b = (JButton)ae.getSource();
+		mapView.addEnemy(b.getText(), x, y);
 	}
 	
 }
