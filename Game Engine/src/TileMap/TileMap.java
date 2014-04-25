@@ -91,6 +91,7 @@ public class TileMap {
 					case "None" : continue;
 					case "Bat" : 
 						enemyData[j][i] = new Bat(this, i * tileSize, j * tileSize); 
+						System.out.println("Bat" + j + " " + i);
 						break;
 					}
 				}
@@ -99,8 +100,8 @@ public class TileMap {
 			frame = new BufferedImage(GamePanel.WIDTH * GamePanel.SCALE, GamePanel.HEIGHT * GamePanel.SCALE, BufferedImage.TYPE_INT_RGB);
 			
 			liveEnemies = new ArrayList<Enemy>();
-			liveEnemies.add(new Bat(this, 5 * tileSize, 5 * tileSize));
-			liveEnemies.add(new Bat(this, 4 * tileSize, 4 * tileSize));
+//			liveEnemies.add(new Bat(this, 5 * tileSize, 5 * tileSize));
+//			liveEnemies.add(new Bat(this, 4 * tileSize, 4 * tileSize));
 			
 			
 		} catch (Exception e){
@@ -227,14 +228,17 @@ public class TileMap {
 			for (int i = 0; i < numColsToDraw; i++){
 				int col = colOffset + i;
 				if (col >= cols) break;
-				if (tileData[row][col] == 0) continue;
-				
+
 				if (enemyData[row][col] != null){
 					Enemy e = enemyData[row][col];
 					if (!e.isActive()){
+						//add in bounds thing
+						e.spawn();
 						liveEnemies.add(e);
 					}
 				}
+				
+				if (tileData[row][col] == 0) continue;
 				
 				camGraphics.drawImage(tiles[row][col].getImage().getScaledInstance(tileSize * GamePanel.SCALE, tileSize * GamePanel.SCALE, 0),
 									  i * tileSize * GamePanel.SCALE,
@@ -257,11 +261,12 @@ public class TileMap {
 			Enemy e = liveEnemies.get(i);
 			if (e == null) continue;
 			//fix the ranges to allow for one tile outlier?
-			if (!e.isActive() ||
+			if (//!e.isActive() ||
 				e.getX() + e.getWidth() < camX ||
 				e.getX() > camX + GamePanel.WIDTH || 
 				e.getY() + e.getHeight() < camY || 
 				e.getY() > camY + GamePanel.HEIGHT){
+				System.out.println("Enemy dying");
 				e.die();
 				liveEnemies.remove(i);
 			} else {

@@ -23,7 +23,7 @@ public class Bat extends Enemy{
 	
 	private double activateDistance;
 	
-	private boolean active, attacking;
+	private boolean attacking;
 	
 	private BufferedImage[][] spriteSheet;
 	private int[] numFrames = {4, 4};
@@ -38,6 +38,8 @@ public class Bat extends Enemy{
 		height = 16;
 		
 		right = true;
+		
+		active = false;
 		
 		terminalVelocity = 2;
 		
@@ -127,6 +129,7 @@ public class Bat extends Enemy{
 //				System.out.println(startX + ", "  + startY + "-->" + endX + " " + endY);
 //				System.out.println(dx + " " + dy);
 			}
+			System.out.println(attacking + " " + endX + " " + endY);
 		} else {
 			if ((dx > 0 && x >= endX) ||
 				(dx < 0 && x <= endX)){
@@ -153,7 +156,10 @@ public class Bat extends Enemy{
 	public void spawn() {
 		x = spawnX;
 		y = spawnY;
-		currentState = IDLE;
+		startX = endX = (int)x;
+		startY = endY = (int)y;
+		currentState = FLYING;
+		active = true;
 	}
 
 	@Override

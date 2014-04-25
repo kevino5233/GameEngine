@@ -128,7 +128,7 @@ public class Player extends Sprite{
 	}
 	
 	public void draw(Graphics2D g){
-		if (!(framesLeftInvincible % 10 >= 1 && framesLeftInvincible % 10 <= 6)){
+		if (!(framesLeftInvincible % 10 >= 3 && framesLeftInvincible % 10 <= 6)){
 			BufferedImage temp = animatino.getImage();
 			int draw_x = this.getX() - tileMap.getX();
 			int draw_y = this.getY() - tileMap.getY();

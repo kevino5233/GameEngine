@@ -4,7 +4,7 @@ import TileMap.TileMap;
 
 public abstract class Enemy extends Sprite{
 	
-	private boolean active;
+	protected boolean active;
 	
 	protected double spawnX, spawnY;
 
