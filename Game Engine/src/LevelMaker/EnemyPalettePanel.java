@@ -21,7 +21,7 @@ public class EnemyPalettePanel extends JPanel implements ActionListener{
 	public EnemyPalettePanel(MapView parent){
 		mapView = parent;
 		
-		playerSpawnButton = new JButton("Player Spawn");
+		playerSpawnButton = new JButton("Player");
 		
 		enemyButtons = new JButton[2][];
 		

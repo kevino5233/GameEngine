@@ -10,8 +10,10 @@ import javax.imageio.ImageIO;
 
 import Entity.Bat;
 import Entity.Enemy;
+import Entity.Goat;
 import Entity.Player;
 import Entity.Sprite;
+import Event.*;
 import LevelMaker.LevelMakerData;
 import Main.GamePanel;
 
@@ -22,7 +24,6 @@ public class TileMap {
 	private double camX, camY;
 	private int spawnX, spawnY;
 
-	private int rowOffset, colOffset;
 	private int numRowsToDraw, numColsToDraw;
 	
 	private int rows, cols;
@@ -46,6 +47,8 @@ public class TileMap {
 	
 	private Enemy[][] enemyData;
 	
+	private TextEventListener textEventListener;
+	
 	public TileMap(String s){
 		try{
 			
@@ -55,13 +58,16 @@ public class TileMap {
 			LevelMakerData temp = LevelMakerData.parse(new File("./Resources/Levels/" + s + ".lvmk"));
 			
 			tileMap = temp.getTileMap();
-			
 			tileData = temp.getTileTypes();
 			
 			String[][] enemyNames = temp.getEnemyData();
 			enemyData = new Enemy[enemyNames.length][enemyNames[0].length];
 			
+			ArrayList<String> events = temp.getEvents();
+			
 			background = ImageIO.read(new File("./Resources/Backgrounds/" + s + ".png"));
+			
+			textEventListener = new TextEventListener();
 			
 			rows = tileData.length;
 			cols = tileData[0].length;
@@ -72,6 +78,8 @@ public class TileMap {
 			width = cols * tileSize;
 			
 			numTilesAcross = tileMap.getWidth() / tileSize;
+			
+			frame = new BufferedImage(GamePanel.WIDTH * GamePanel.SCALE, GamePanel.HEIGHT * GamePanel.SCALE, BufferedImage.TYPE_INT_RGB);
 			
 			int w = numTilesAcross;
 			for (int j = 0; j < tileData.length; j++){
@@ -88,21 +96,27 @@ public class TileMap {
 			for (int j = 0; j < enemyNames.length; j++){
 				for (int i = 0; i < enemyNames[0].length; i++){
 					switch(enemyNames[j][i]){
-					case "None" : continue;
+					case "None" : 
+						continue;
+					case "Player" :
+						spawnY = j;
+						spawnX = i;
+						break;
 					case "Bat" : 
 						enemyData[j][i] = new Bat(this, i * tileSize, j * tileSize); 
-						System.out.println("Bat" + j + " " + i);
+						break;
+					case "Goat" :
+						enemyData[j][i] = new Goat(this, i * tileSize, j * tileSize);
 						break;
 					}
 				}
 			}
 			
-			frame = new BufferedImage(GamePanel.WIDTH * GamePanel.SCALE, GamePanel.HEIGHT * GamePanel.SCALE, BufferedImage.TYPE_INT_RGB);
+			liveEnemies = new ArrayList<>();
 			
-			liveEnemies = new ArrayList<Enemy>();
-//			liveEnemies.add(new Bat(this, 5 * tileSize, 5 * tileSize));
-//			liveEnemies.add(new Bat(this, 4 * tileSize, 4 * tileSize));
-			
+			while(!events.isEmpty()){
+				textEventListener.add(events.remove(0));
+			}
 			
 		} catch (Exception e){
 			System.out.println("You dunn fucked up");
@@ -198,6 +212,13 @@ public class TileMap {
 	}
 	
 	public void update(Player player){
+		
+		textEventListener.playMessage(player.getX(), player.getY());
+		
+		if (textEventListener.isPlaying()){
+			return;
+		}
+		
 		int numColsToDraw = GamePanel.WIDTH / tileSize + 1;
 		int numRowsToDraw = GamePanel.HEIGHT / tileSize + 1;
 		int colOffset = (int)camX / tileSize;
@@ -277,7 +298,7 @@ public class TileMap {
 	}
 	
 	public void draw(Graphics2D g){
-
+		
 		g.drawImage(frame,
 					0, 
 					0, 
@@ -288,6 +309,9 @@ public class TileMap {
 			e.draw(g);
 		}
 		
+		if (textEventListener.isPlaying()){
+			textEventListener.draw(g);
+		}
 		
 	}
 }

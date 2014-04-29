@@ -1,10 +1,9 @@
 package LevelMaker;
 
 import java.awt.image.BufferedImage;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class LevelMakerData {
@@ -15,17 +14,21 @@ public class LevelMakerData {
 	
 	private String[][] enemyData;
 	
-	private LevelMakerData(BufferedImage tm, int[][] tt, String[][] ed){
+	private ArrayList<String> events;
+	
+	private LevelMakerData(BufferedImage tm, int[][] tt, String[][] ed, ArrayList<String> ev){
 		tileMap = tm;
 		tileTypes = tt;
 		enemyData = ed;
+		events = ev;
 	}
 	
 	public BufferedImage getTileMap(){ return tileMap; }
 	public int[][] getTileTypes(){ return tileTypes; }
 	public String[][] getEnemyData(){ return enemyData; }
+	public ArrayList<String> getEvents(){ return events; }
 	
-	public static String getSaveableData(BufferedImage tileMap, int[][] tileTypes, String[][] enemyData){
+	public static String getSaveableData(BufferedImage tileMap, int[][] tileTypes, String[][] enemyData, ArrayList<String> textEvents){
 		String contents = "";
 		contents += String.format("%d %d\n", tileMap.getHeight(), tileMap.getWidth());
 		for (int j = 0; j < tileMap.getHeight(); j++){
@@ -57,11 +60,15 @@ public class LevelMakerData {
 			}
 			contents += '\n';
 		}
+		while(!textEvents.isEmpty()){
+			contents += textEvents.remove(0);
+			contents += '\n';
+		}
 		return contents;
 	}
 	
 	public static LevelMakerData getLevelMakerData(BufferedImage tileMap, int cols, int rows){
-		return new LevelMakerData(tileMap, new int[rows][cols], new String[rows][cols]);
+		return new LevelMakerData(tileMap, new int[rows][cols], new String[rows][cols], new ArrayList<String>());
 	}
 	
 	public static LevelMakerData parse(File f)throws IOException{
@@ -86,8 +93,13 @@ public class LevelMakerData {
 				ed[j][i] = in.next();
 			}
 		}
+		in.nextLine();
+		ArrayList<String> ev = new ArrayList<String>();
+		while(in.hasNextLine()){
+			ev.add(in.nextLine());
+		}
 		in.close();
-		return new LevelMakerData(tm, tt, ed);
+		return new LevelMakerData(tm, tt, ed, ev);
 	}
 	
 }

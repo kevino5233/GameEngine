@@ -59,7 +59,7 @@ public class HubState extends GameState{
 //					0, 
 //					null
 //					);
-			
+
 			tileMap.draw(g);
 			player.draw(g);
 		} catch (NullPointerException e){

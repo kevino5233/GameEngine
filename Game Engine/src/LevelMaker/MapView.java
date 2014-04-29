@@ -10,6 +10,7 @@ import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
 import javax.swing.JComponent;
@@ -35,6 +36,7 @@ public class MapView extends JComponent implements MouseListener{
 	private String[][] enemies;
 	private BufferedImage[][] tiles;
 	private int[][] levelData;
+	private ArrayList<String> textEvents;
 	
 	private int camX, camY;
 	
@@ -66,6 +68,8 @@ public class MapView extends JComponent implements MouseListener{
 		} catch (IOException e) {
 			System.out.println("Could not load grid");
 		}
+		
+		textEvents = new ArrayList<>();
 
 		displayEnemies = false;
 		
@@ -153,13 +157,14 @@ public class MapView extends JComponent implements MouseListener{
 	}
 	
 	public String getLevelData(){
-		return LevelMakerData.getSaveableData(tileMap, levelData, enemies);
+		return LevelMakerData.getSaveableData(tileMap, levelData, enemies, textEvents);
 	}
 	
 	public void load(LevelMakerData lvmk){
 		tileMap = lvmk.getTileMap();
 		levelData = lvmk.getTileTypes();
 		enemies = lvmk.getEnemyData();
+		textEvents = lvmk.getEvents();
 		tiles = new BufferedImage[levelData.length][levelData[0].length];
 		palettePanel.setMap(tileMap, 16);
 		int tiles_vertically_across = tileMap.getHeight() / 16;
