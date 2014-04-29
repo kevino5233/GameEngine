@@ -5,10 +5,13 @@ import java.awt.event.ActionListener;
 
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 public class EnemyPalettePanel extends JPanel implements ActionListener{
+	
+	JFrame frame;
 	
 	private JButton playerSpawnButton;
 	
@@ -18,10 +21,13 @@ public class EnemyPalettePanel extends JPanel implements ActionListener{
 	
 	private int x, y;
 	
-	public EnemyPalettePanel(MapView parent){
+	public EnemyPalettePanel(MapView parent, JFrame frame){
 		mapView = parent;
 		
+		this.frame = frame;
+		
 		playerSpawnButton = new JButton("Player");
+		playerSpawnButton.addActionListener(this);
 		
 		enemyButtons = new JButton[2][];
 		
@@ -88,7 +94,6 @@ public class EnemyPalettePanel extends JPanel implements ActionListener{
 				)
 		);
 		
-		
 	}
 	
 	public void setCoordinates(int x, int y){
@@ -98,8 +103,11 @@ public class EnemyPalettePanel extends JPanel implements ActionListener{
 
 	@Override
 	public void actionPerformed(ActionEvent ae) {
-		JButton b = (JButton)ae.getSource();
-		mapView.addEnemy(b.getText(), x, y);
+		if (ae.getSource() instanceof JButton){
+			JButton b = (JButton)ae.getSource();
+			mapView.addEnemy(b.getText(), x, y);
+			frame.setVisible(false);
+		}
 	}
 	
 }

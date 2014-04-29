@@ -49,4 +49,8 @@ public class TextEvent {
 	public void reset(){
 		display = "";
 	}
+	
+	public String toString(){
+		return speaker + "|" + message;
+	}
 }

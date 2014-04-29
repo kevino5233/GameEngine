@@ -20,10 +20,13 @@ public class TilePalettePanel extends JPanel implements ActionListener{
 	
 	private MapView parent;
 	
-	public TilePalettePanel(MapView parent){
+	private JFrame frame;
+	
+	public TilePalettePanel(MapView parent, JFrame frame){
 		requestFocusInWindow();
 		setPreferredSize(new Dimension(100, 100));
 		this.parent = parent;
+		this.frame = frame;
 	}
 	
 	public void setMap(BufferedImage tile_map, int resolution){
@@ -74,6 +77,7 @@ public class TilePalettePanel extends JPanel implements ActionListener{
 		JButton temp_button = (JButton)ae.getSource();
 		ImageIcon temp_icon = (ImageIcon)temp_button.getIcon();
 		parent.addTile((BufferedImage)temp_icon.getImage(), Integer.parseInt(temp_button.getText()), x, y);
+		frame.setVisible(false);
 	}
 	
 	

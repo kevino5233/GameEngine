@@ -4,6 +4,7 @@ import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
@@ -13,7 +14,7 @@ import Entity.Enemy;
 import Entity.Goat;
 import Entity.Player;
 import Entity.Sprite;
-import Event.*;
+import Event.TextEventListener;
 import LevelMaker.LevelMakerData;
 import Main.GamePanel;
 
@@ -124,6 +125,61 @@ public class TileMap {
 		}
 	}
 	
+	public TileMap(BufferedImage bg, BufferedImage tm, int[][] td, String[][] ed){
+		tileMap = tm;
+		
+		tileData = td;
+		
+		rows = tileData.length;
+		cols = tileData[0].length;
+		
+		tiles = new Tile[rows][cols];
+		
+		numTilesAcross = tileMap.getWidth() / tileSize;
+		
+		int w = numTilesAcross;
+		for (int j = 0; j < tileData.length; j++){
+			for (int i = 0; i < tileData[0].length; i++){
+				int type = tileData[j][i];
+				tiles[j][i] = new Tile(tileMap.getSubimage(type % numTilesAcross * tileSize, 
+														   type / numTilesAcross * tileSize, 
+														   tileSize, 
+														   tileSize), 
+														   type / w);
+			}
+		}
+		
+		height = rows * tileSize;
+		width = cols * tileSize;
+		
+		enemyData = new Enemy[ed.length][ed[0].length];
+		for (int j = 0; j < ed.length; j++){
+			for (int i = 0; i < ed[0].length; i++){
+				switch(ed[j][i]){
+				case "None" : 
+					break;
+				case "Player" :
+					spawnY = j;
+					spawnX = i;
+					break;
+				case "Bat" : 
+					enemyData[j][i] = new Bat(this, i * tileSize, j * tileSize); 
+					break;
+				case "Goat" :
+					enemyData[j][i] = new Goat(this, i * tileSize, j * tileSize);
+					break;
+				}
+			}
+		}
+		
+		liveEnemies = new ArrayList<>();
+
+		background = bg;
+		
+		frame = new BufferedImage(GamePanel.WIDTH * GamePanel.SCALE, GamePanel.HEIGHT * GamePanel.SCALE, BufferedImage.TYPE_INT_RGB);
+		
+	}
+	
 	public int getTileSize(){ return tileSize; }
 	public int getX(){ return (int)camX; }
 	public int getY(){ return (int)camY; }
@@ -213,11 +269,11 @@ public class TileMap {
 	
 	public void update(Player player){
 		
-		textEventListener.playMessage(player.getX(), player.getY());
-		
-		if (textEventListener.isPlaying()){
-			return;
-		}
+//		textEventListener.playMessage(player.getX(), player.getY());
+//		
+//		if (textEventListener.isPlaying()){
+//			return;
+//		}
 		
 		int numColsToDraw = GamePanel.WIDTH / tileSize + 1;
 		int numRowsToDraw = GamePanel.HEIGHT / tileSize + 1;
@@ -309,9 +365,9 @@ public class TileMap {
 			e.draw(g);
 		}
 		
-		if (textEventListener.isPlaying()){
-			textEventListener.draw(g);
-		}
+//		if (textEventListener.isPlaying()){
+//			textEventListener.draw(g);
+//		}
 		
 	}
 }

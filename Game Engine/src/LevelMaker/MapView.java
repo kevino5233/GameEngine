@@ -16,6 +16,8 @@ import javax.imageio.ImageIO;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 
+import Event.TextEvent;
+
 public class MapView extends JComponent implements MouseListener{
 
 	private BufferedImage zaBokusu;
@@ -25,18 +27,14 @@ public class MapView extends JComponent implements MouseListener{
 	private static int resNum = 2;
 	private static final int[] tilesAcross = {10, 20, 40, 60, 100};
 	
-	private JFrame paletteFrame;
-	private TilePalettePanel palettePanel;
-	
-	private JFrame enemyFrame;
-	private EnemyPalettePanel enemyPanel;
+	private InsertFrame insertFrame;
 	
 	private BufferedImage tileMap;
 	
 	private String[][] enemies;
 	private BufferedImage[][] tiles;
 	private int[][] levelData;
-	private ArrayList<String> textEvents;
+	private TextEvent[][] textEvents;
 	
 	private int camX, camY;
 	
@@ -49,29 +47,21 @@ public class MapView extends JComponent implements MouseListener{
 		tiles = new BufferedImage[tilesAcross[resNum]][tilesAcross[resNum]];
 		levelData = new int[tilesAcross[resNum]][tilesAcross[resNum]];
 		enemies = new String[tilesAcross[resNum]][tilesAcross[resNum]];
+		textEvents = new TextEvent[tilesAcross[resNum]][tilesAcross[resNum]];
 		
 		camX = 0;
 		camY = 0;
-
-		palettePanel = new TilePalettePanel(this);
-		paletteFrame = new JFrame("Select Tile");
-		paletteFrame.setContentPane(palettePanel);
-	    
-		enemyPanel = new EnemyPalettePanel(this);
-		enemyFrame = new JFrame("Select Enemy");
-		enemyFrame.setContentPane(enemyPanel);
 		
-		paletteFrame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
-		paletteFrame.setResizable(false);
 		try {
 			zaBokusu = ImageIO.read(new File("./Resources/ZA_BOX.png"));
 		} catch (IOException e) {
 			System.out.println("Could not load grid");
 		}
-		
-		textEvents = new ArrayList<>();
 
 		displayEnemies = false;
+		
+		insertFrame = new InsertFrame(this);
+		insertFrame.setResizable(false);
 		
 		addMouseListener(this);
 		
@@ -80,8 +70,6 @@ public class MapView extends JComponent implements MouseListener{
 	}
 	
 	public void addEnemy(String name, int x, int y){
-		
-		enemyFrame.setVisible(false);
 		
 		int res = SIDE / tilesAcross[resNum];
 
@@ -96,8 +84,6 @@ public class MapView extends JComponent implements MouseListener{
 	
 	public void addTile(BufferedImage tile, int tile_num, int x, int y){
 
-		paletteFrame.setVisible(false);
-		
 		int res = SIDE / tilesAcross[resNum];
 		
 		x = (x + camX) / res;
@@ -108,6 +94,15 @@ public class MapView extends JComponent implements MouseListener{
 		
 		repaint();
 		
+	}
+	
+	public void addTextEvent(int x, int y, String message, String speaker){
+		int res = SIDE / tilesAcross[resNum];
+		
+		x = (x + camX) / res;
+		y = (y + camX) / res;
+		
+		textEvents[y][x] = new TextEvent(message, speaker);
 	}
 	
 	private BufferedImage currentFrame(){
@@ -160,13 +155,23 @@ public class MapView extends JComponent implements MouseListener{
 		return LevelMakerData.getSaveableData(tileMap, levelData, enemies, textEvents);
 	}
 	
+	public TextEvent getTextEvent(int x, int y){
+		int res = SIDE / tilesAcross[resNum];
+		
+		x = (x + camX) / res;
+		y = (y + camX) / res;
+		
+		return textEvents[y][x];
+	}
+	
 	public void load(LevelMakerData lvmk){
 		tileMap = lvmk.getTileMap();
 		levelData = lvmk.getTileTypes();
 		enemies = lvmk.getEnemyData();
-		textEvents = lvmk.getEvents();
+		textEvents = new TextEvent[enemies.length][enemies[0].length];
+		ArrayList<String> textEventList = lvmk.getEvents();
+		insertFrame.setMap(tileMap, 16);
 		tiles = new BufferedImage[levelData.length][levelData[0].length];
-		palettePanel.setMap(tileMap, 16);
 		int tiles_vertically_across = tileMap.getHeight() / 16;
 		int tiles_horizontally_across = tileMap.getWidth() / 16;
 		for (int j = 0; j < levelData.length; j++){
@@ -179,6 +184,19 @@ public class MapView extends JComponent implements MouseListener{
 						16
 				);
 			}
+		}
+		for (String s : textEventList){
+			String[] dat = s.split("|");
+			
+			int x = Integer.parseInt(dat[2]);
+			int y = Integer.parseInt(dat[3]);
+			
+			String speaker = dat[2];
+			String message = dat[3];
+			TextEvent temp = new TextEvent(speaker, message);
+			
+			textEvents[y][x] = temp;
+			
 		}
 		repaint();
 	}
@@ -220,21 +238,31 @@ public class MapView extends JComponent implements MouseListener{
 		repaint();
 	}
 
+	public BufferedImage getTilemap(){ return tileMap; }
+	
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		if (e.getButton() == MouseEvent.BUTTON1){
-			requestFocusInWindow();
-			palettePanel.setCoordinates(e.getX(), e.getY());
-			paletteFrame.pack();
-			paletteFrame.setResizable(false);
-			paletteFrame.setVisible(true);
-		} else {
-			requestFocusInWindow();
-			enemyPanel.setCoordinates(e.getX(), e.getY());
-			enemyFrame.pack();
-			enemyFrame.setResizable(false);
-			enemyFrame.setVisible(true);
-		}
+		insertFrame.setCoordinates(e.getX(), e.getY());
+		insertFrame.pack();
+		insertFrame.setVisible(true);
+//		int numClicks = e.getClickCount();
+//		if (e.getButton() == MouseEvent.BUTTON1){
+//			requestFocusInWindow();
+//			if (numClicks == 2){
+//				System.out.println("Double clickuuu");
+//			} else if (numClicks == 1){
+//				palettePanel.setCoordinates(e.getX(), e.getY());
+//				paletteFrame.pack();
+//				paletteFrame.setResizable(false);
+//				paletteFrame.setVisible(true);
+//			}
+//		} else {
+//			requestFocusInWindow();
+//			enemyPanel.setCoordinates(e.getX(), e.getY());
+//			enemyFrame.pack();
+//			enemyFrame.setResizable(false);
+//			enemyFrame.setVisible(true);
+//		}
 	}
 
 	@Override

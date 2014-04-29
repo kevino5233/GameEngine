@@ -3,11 +3,14 @@ package GameState;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
 
 import Entity.Player;
-import Main.GamePanel;
+import Event.TextEventListener;
+import LevelMaker.LevelMakerData;
 import TileMap.TileMap;
 
 public class HubState extends GameState{
@@ -16,9 +19,9 @@ public class HubState extends GameState{
 	
 	private Player player;
 	
-	//draw everything on to this image and then draw this image on to the main panel thing when it is called by the GSM
-	//maybe have a background class to add more variety to backgrounds
-	private BufferedImage bg;
+	private LevelMakerData lvmk;
+	
+	private TextEventListener textEventListener;
 	
 	//something to keep track of the level ports/doors
 	
@@ -26,15 +29,28 @@ public class HubState extends GameState{
 	
 	public HubState(GameStateManager gsm){
 		this.gsm = gsm;
+		try{
+			//tileMap = new TileMap("hub");
+			BufferedImage bg = ImageIO.read(new File("./Resources/Backgrounds/hub.png"));
+			lvmk = LevelMakerData.parse(new File("./Resources/Levels/hub.lvmk"));
+			tileMap = new TileMap(bg, lvmk.getTileMap(), lvmk.getTileTypes(), lvmk.getEnemyData());
+			player = new Player(tileMap, gsm.getFire(), gsm.getAir(), gsm.getDifficulty());
+			textEventListener = new TextEventListener();
+		} catch (IOException e){
+			//couldn't find the level
+		} catch (Exception e){
+			//some other error
+		}
 	}
 
 	@Override
 	public void init() {
 		try{
-			tileMap = new TileMap("hub");
-			player = new Player(tileMap, gsm.getFire(), gsm.getAir(), gsm.getDifficulty());
 			player.spawn();
-			bg = ImageIO.read(new File("./Resources/Backgrounds/hub.png"));
+			ArrayList<String> textEvents = lvmk.getEvents();
+			for (String s : textEvents){
+				textEventListener.add(s);
+			}
 		} catch (Exception e){
 			e.printStackTrace();
 		}
@@ -44,6 +60,7 @@ public class HubState extends GameState{
 	public void update() {
 		if (tileMap != null && player != null){
 			player.update();
+			System.out.println(tileMap.getPlayerSpawnX() +", " + tileMap.getPlayerSpawnY());
 			tileMap.center(player.getX(), player.getY());
 			tileMap.update(player);
 		}
@@ -64,6 +81,7 @@ public class HubState extends GameState{
 			player.draw(g);
 		} catch (NullPointerException e){
 			System.out.println("Shit be null");
+			e.printStackTrace();
 		} catch (Exception e){
 			e.printStackTrace();
 		}

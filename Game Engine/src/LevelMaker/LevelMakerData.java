@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+import Event.TextEvent;
+
 public class LevelMakerData {
 
 	private BufferedImage tileMap;
@@ -28,7 +30,7 @@ public class LevelMakerData {
 	public String[][] getEnemyData(){ return enemyData; }
 	public ArrayList<String> getEvents(){ return events; }
 	
-	public static String getSaveableData(BufferedImage tileMap, int[][] tileTypes, String[][] enemyData, ArrayList<String> textEvents){
+	public static String getSaveableData(BufferedImage tileMap, int[][] tileTypes, String[][] enemyData, TextEvent[][] textEvents){
 		String contents = "";
 		contents += String.format("%d %d\n", tileMap.getHeight(), tileMap.getWidth());
 		for (int j = 0; j < tileMap.getHeight(); j++){
@@ -55,14 +57,17 @@ public class LevelMakerData {
 				if (enemyData[j][i] == null){
 					contents += "None ";
 				} else {
-					contents += enemyData[j][i];
+					contents += enemyData[j][i] + " ";
 				}
 			}
 			contents += '\n';
 		}
-		while(!textEvents.isEmpty()){
-			contents += textEvents.remove(0);
-			contents += '\n';
+		for (int j = 0; j < textEvents.length; j++){
+			for (int i = 0; i < textEvents[0].length; i++){
+				if (textEvents[j][i] != null){
+					contents += i + "|" + j + "|" + textEvents[j][i] + "\n";
+				}
+			}
 		}
 		return contents;
 	}
