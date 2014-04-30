@@ -9,18 +9,14 @@ import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
 
-import Entity.Bat;
-import Entity.Enemy;
-import Entity.Goat;
-import Entity.Player;
-import Entity.Sprite;
+import Entity.*;
 import Event.TextEventListener;
 import LevelMaker.LevelMakerData;
 import Main.GamePanel;
 
 public class TileMap {
 
-	private final static int tileSize = 16;
+	public final static int tileSize = 16;
 	
 	private double camX, camY;
 	private int spawnX, spawnY;
@@ -47,83 +43,6 @@ public class TileMap {
 	private Tile[][] tiles;
 	
 	private Enemy[][] enemyData;
-	
-	private TextEventListener textEventListener;
-	
-	public TileMap(String s){
-		try{
-			
-			spawnX = 1;
-			spawnY = 4;
-			
-			LevelMakerData temp = LevelMakerData.parse(new File("./Resources/Levels/" + s + ".lvmk"));
-			
-			tileMap = temp.getTileMap();
-			tileData = temp.getTileTypes();
-			
-			String[][] enemyNames = temp.getEnemyData();
-			enemyData = new Enemy[enemyNames.length][enemyNames[0].length];
-			
-			ArrayList<String> events = temp.getEvents();
-			
-			background = ImageIO.read(new File("./Resources/Backgrounds/" + s + ".png"));
-			
-			textEventListener = new TextEventListener();
-			
-			rows = tileData.length;
-			cols = tileData[0].length;
-			
-			tiles = new Tile[rows][cols];
-			
-			height = rows * tileSize;
-			width = cols * tileSize;
-			
-			numTilesAcross = tileMap.getWidth() / tileSize;
-			
-			frame = new BufferedImage(GamePanel.WIDTH * GamePanel.SCALE, GamePanel.HEIGHT * GamePanel.SCALE, BufferedImage.TYPE_INT_RGB);
-			
-			int w = numTilesAcross;
-			for (int j = 0; j < tileData.length; j++){
-				for (int i = 0; i < tileData[0].length; i++){
-					int type = tileData[j][i];
-					tiles[j][i] = new Tile(tileMap.getSubimage(type % numTilesAcross * tileSize, 
-															   type / numTilesAcross * tileSize, 
-															   tileSize, 
-															   tileSize), 
-															   type / w);
-				}
-			}
-			
-			for (int j = 0; j < enemyNames.length; j++){
-				for (int i = 0; i < enemyNames[0].length; i++){
-					switch(enemyNames[j][i]){
-					case "None" : 
-						continue;
-					case "Player" :
-						spawnY = j;
-						spawnX = i;
-						break;
-					case "Bat" : 
-						enemyData[j][i] = new Bat(this, i * tileSize, j * tileSize); 
-						break;
-					case "Goat" :
-						enemyData[j][i] = new Goat(this, i * tileSize, j * tileSize);
-						break;
-					}
-				}
-			}
-			
-			liveEnemies = new ArrayList<>();
-			
-			while(!events.isEmpty()){
-				textEventListener.add(events.remove(0));
-			}
-			
-		} catch (Exception e){
-			System.out.println("You dunn fucked up");
-			e.printStackTrace();
-		}
-	}
 	
 	public TileMap(BufferedImage bg, BufferedImage tm, int[][] td, String[][] ed){
 		tileMap = tm;
@@ -167,6 +86,9 @@ public class TileMap {
 					break;
 				case "Goat" :
 					enemyData[j][i] = new Goat(this, i * tileSize, j * tileSize);
+					break;
+				case "Spike" :
+					enemyData[j][i] = new Spike(this, i * tileSize, j * tileSize);
 					break;
 				}
 			}
@@ -264,7 +186,8 @@ public class TileMap {
 		if (camX > width - GamePanel.WIDTH) camX = width - GamePanel.WIDTH;
 		if (camY < 0) camY = 0;
 		if (camY > height - GamePanel.HEIGHT) camY = height - GamePanel.HEIGHT;
-
+		
+		
 	}
 	
 	public void update(Player player){
@@ -274,6 +197,8 @@ public class TileMap {
 //		if (textEventListener.isPlaying()){
 //			return;
 //		}
+		
+		center(player.getX(), player.getY());
 		
 		int numColsToDraw = GamePanel.WIDTH / tileSize + 1;
 		int numRowsToDraw = GamePanel.HEIGHT / tileSize + 1;
@@ -305,7 +230,7 @@ public class TileMap {
 			for (int i = 0; i < numColsToDraw; i++){
 				int col = colOffset + i;
 				if (col >= cols) break;
-
+				
 				if (enemyData[row][col] != null){
 					Enemy e = enemyData[row][col];
 					if (!e.isActive()){

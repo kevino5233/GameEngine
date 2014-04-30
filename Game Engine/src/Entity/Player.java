@@ -30,11 +30,10 @@ public class Player extends Sprite{
 	private static int IDLE = 0;
 	private static int WALKING = 1;
 	private static int JUMPING = 2;
-	private static int FALLING = 3;
-	private static int ATTACKING = 4;
-	private static int BLOCKING = 5;
-	private static int FLINCHING = 6;
-	private static int EARTHMOVE = 7;
+	private static int ATTACKING = 3;
+	private static int BLOCKING = 4;
+	private static int FLINCHING = 5;
+	private static int EARTHMOVE = 6;
 	/*might not exist */private static int AIRMOVE = 8;
 	
 	public Player(TileMap tm, boolean fire, boolean air, int difficulty){
@@ -253,6 +252,9 @@ public class Player extends Sprite{
 			break;
 		case KeyEvent.VK_RIGHT : 
 			turnRight();
+			break;
+		case KeyEvent.VK_Z :
+			//attack
 			break;
 		}
 	}

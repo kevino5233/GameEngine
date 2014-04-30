@@ -74,7 +74,7 @@ public class MapView extends JComponent implements MouseListener{
 		int res = SIDE / tilesAcross[resNum];
 
 		x = (x + camX) / res;
-		y = (y + camX) / res;
+		y = (y + camY) / res;
 
 		enemies[y][x] = name;
 		
@@ -87,7 +87,7 @@ public class MapView extends JComponent implements MouseListener{
 		int res = SIDE / tilesAcross[resNum];
 		
 		x = (x + camX) / res;
-		y = (y + camX) / res;
+		y = (y + camY) / res;
 		
 		tiles[y][x] = tile;
 		levelData[y][x] = tile_num;
@@ -96,11 +96,11 @@ public class MapView extends JComponent implements MouseListener{
 		
 	}
 	
-	public void addTextEvent(int x, int y, String message, String speaker){
+	public void addTextEvent(int x, int y, String speaker, String message){
 		int res = SIDE / tilesAcross[resNum];
 		
 		x = (x + camX) / res;
-		y = (y + camX) / res;
+		y = (y + camY) / res;
 		
 		textEvents[y][x] = new TextEvent(message, speaker);
 	}
@@ -186,14 +186,14 @@ public class MapView extends JComponent implements MouseListener{
 			}
 		}
 		for (String s : textEventList){
-			String[] dat = s.split("|");
+			String[] dat = s.split("[|]");
 			
-			int x = Integer.parseInt(dat[2]);
-			int y = Integer.parseInt(dat[3]);
+			int x = Integer.parseInt(dat[0]);
+			int y = Integer.parseInt(dat[1]);
 			
-			String speaker = dat[2];
-			String message = dat[3];
-			TextEvent temp = new TextEvent(speaker, message);
+			String speaker = dat[3];
+			String message = dat[2];
+			TextEvent temp = new TextEvent(message, speaker);
 			
 			textEvents[y][x] = temp;
 			

@@ -37,8 +37,6 @@ public class Bat extends Enemy{
 		width = 16;
 		height = 16;
 		
-		right = true;
-		
 		active = false;
 		
 		terminalVelocity = 2;
@@ -76,8 +74,6 @@ public class Bat extends Enemy{
 				  					 new Rectangle(sp.getX(), sp.getY(), sp.getWidth(), sp.getHeight())
 				 					);
 		if (code != -1){
-			if (code < 3) code += 2;
-			sp.collide(new Rectangle((int)x, (int)y, width, height), code);
 			sp.takeDamage(3);
 		}
 		if (x == endX && y == endY){
@@ -129,7 +125,6 @@ public class Bat extends Enemy{
 //				System.out.println(startX + ", "  + startY + "-->" + endX + " " + endY);
 //				System.out.println(dx + " " + dy);
 			}
-			System.out.println(attacking + " " + endX + " " + endY);
 		} else {
 			if ((dx > 0 && x >= endX) ||
 				(dx < 0 && x <= endX)){

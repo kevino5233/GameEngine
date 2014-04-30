@@ -1,6 +1,7 @@
 package Event;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics2D;
 
 import Main.GamePanel;
@@ -26,7 +27,7 @@ public class TextEvent {
 	
 	public void update(){
 		if (!done){
-			display += message.charAt(0);
+			display += message.charAt(display.length());
 			done = message.length() == display.length();
 		}
 	}
@@ -34,10 +35,15 @@ public class TextEvent {
 	public void draw(Graphics2D g){
 		
 		g.setColor(new Color(0x66ccff));
-		g.drawRect(50, 10, GamePanel.WIDTH * GamePanel.SCALE - 50, 50);
+		g.fillRect(50, 10, GamePanel.WIDTH * GamePanel.SCALE - 100, 50);
 		g.setColor(Color.BLACK);
+		g.setFont(new Font("Arial", Font.BOLD, 10));
 		g.drawString(speaker, 55, 20);
+		g.setFont(new Font("Arial", Font.PLAIN, 10));
 		g.drawString(display, 60, 30);
+		if (done) {
+			g.drawString("Press space to continue", GamePanel.WIDTH * GamePanel.SCALE - 175, 50);
+		}
 		
 	}
 	

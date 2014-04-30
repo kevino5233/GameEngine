@@ -19,9 +19,9 @@ public class HubState extends GameState{
 	
 	private Player player;
 	
-	private LevelMakerData lvmk;
-	
 	private TextEventListener textEventListener;
+	
+	private LevelMakerData lvmk;
 	
 	//something to keep track of the level ports/doors
 	
@@ -36,32 +36,38 @@ public class HubState extends GameState{
 			tileMap = new TileMap(bg, lvmk.getTileMap(), lvmk.getTileTypes(), lvmk.getEnemyData());
 			player = new Player(tileMap, gsm.getFire(), gsm.getAir(), gsm.getDifficulty());
 			textEventListener = new TextEventListener();
+			
 		} catch (IOException e){
-			//couldn't find the level
+			System.out.println("Couldn't find something");
 		} catch (Exception e){
-			//some other error
-		}
-	}
-
-	@Override
-	public void init() {
-		try{
-			player.spawn();
-			ArrayList<String> textEvents = lvmk.getEvents();
-			for (String s : textEvents){
-				textEventListener.add(s);
-			}
-		} catch (Exception e){
+			System.out.println("Some other error");
 			e.printStackTrace();
 		}
 	}
 
 	@Override
+	public void init() {
+		player.spawn();
+		ArrayList<String> textEvents = lvmk.getEvents();
+		for (String s : textEvents){
+			textEventListener.add(s);
+		}
+	}
+
+	@Override
 	public void update() {
-		if (tileMap != null && player != null){
+		if (textEventListener != null){
+			if (!textEventListener.isPlaying()){
+				textEventListener.playMessage(
+						player.getX() / TileMap.tileSize, 
+						player.getY() / TileMap.tileSize
+						);
+			} else {
+				textEventListener.update();
+			}	
+		}
+		if (tileMap != null && player != null && !textEventListener.isPlaying()){
 			player.update();
-			System.out.println(tileMap.getPlayerSpawnX() +", " + tileMap.getPlayerSpawnY());
-			tileMap.center(player.getX(), player.getY());
 			tileMap.update(player);
 		}
 		
@@ -76,9 +82,13 @@ public class HubState extends GameState{
 //					0, 
 //					null
 //					);
-
-			tileMap.draw(g);
-			player.draw(g);
+			if (tileMap != null && player != null && textEventListener != null){
+				tileMap.draw(g);
+				player.draw(g);
+				if (textEventListener.isPlaying()){
+					textEventListener.draw(g);
+				}
+			}
 		} catch (NullPointerException e){
 			System.out.println("Shit be null");
 			e.printStackTrace();
@@ -90,6 +100,7 @@ public class HubState extends GameState{
 	@Override
 	public void keyPressed(int k) {
 		player.keyPressed(k);
+		textEventListener.keyPressed(k);
 	}
 
 	@Override

@@ -14,6 +14,7 @@ public class EnemyPalettePanel extends JPanel implements ActionListener{
 	JFrame frame;
 	
 	private JButton playerSpawnButton;
+	private JButton noneButton;
 	
 	private JButton[][] enemyButtons;
 	
@@ -29,18 +30,23 @@ public class EnemyPalettePanel extends JPanel implements ActionListener{
 		playerSpawnButton = new JButton("Player");
 		playerSpawnButton.addActionListener(this);
 		
+		noneButton = new JButton("None");
+		noneButton .addActionListener(this);
+		
 		enemyButtons = new JButton[2][];
 		
-		enemyButtons[0] = new JButton[4];
+		enemyButtons[0] = new JButton[5];
 		enemyButtons[0][0] = new JButton("Bat");
 		enemyButtons[0][1] = new JButton("Guppy");
 		enemyButtons[0][2] = new JButton("Slug");
 		enemyButtons[0][3] = new JButton("FireElemental");
+		enemyButtons[0][4] = new JButton("Spike");
 		
-		enemyButtons[1] = new JButton[3];
+		enemyButtons[1] = new JButton[4];
 		enemyButtons[1][0] = new JButton("Bat");
 		enemyButtons[1][1] = new JButton("Goat");
 		enemyButtons[1][2] = new JButton("Cyclops");
+		enemyButtons[1][3] = new JButton("Spike");
 		
 		for (JButton[] list : enemyButtons){
 			for (JButton b : list){
@@ -66,6 +72,7 @@ public class EnemyPalettePanel extends JPanel implements ActionListener{
 					.addComponent(enemyButtons[1][0])
 				)
 				.addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+					.addComponent(noneButton)
 					.addComponent(enemyButtons[0][1])
 					.addComponent(enemyButtons[1][1])
 				)
@@ -73,24 +80,33 @@ public class EnemyPalettePanel extends JPanel implements ActionListener{
 					.addComponent(enemyButtons[0][2])
 					.addComponent(enemyButtons[1][2])
 				)
-				.addComponent(enemyButtons[0][3])
+				.addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+					.addComponent(enemyButtons[0][3])
+					.addComponent(enemyButtons[1][3])
+				)
+				.addComponent(enemyButtons[0][4])
 		);
 		
 		layout.setVerticalGroup(
 			layout.createSequentialGroup()
-				.addComponent(playerSpawnButton)
+				.addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+					.addComponent(playerSpawnButton)
+					.addComponent(noneButton)
+				)
 				.addComponent(fireLabel)
 				.addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
 					.addComponent(enemyButtons[0][0])
 					.addComponent(enemyButtons[0][1])
 					.addComponent(enemyButtons[0][2])
 					.addComponent(enemyButtons[0][3])
+					.addComponent(enemyButtons[0][4])
 				)
 				.addComponent(earthLabel)
 				.addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
 					.addComponent(enemyButtons[1][0])
 					.addComponent(enemyButtons[1][1])
 					.addComponent(enemyButtons[1][2])
+					.addComponent(enemyButtons[1][3])
 				)
 		);
 		

@@ -2,11 +2,16 @@ package Event;
 
 import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
+import java.util.Arrays;
 import java.util.HashMap;
+
+import TileMap.TileMap;
 
 public class TextEventListener {
 
 	private HashMap<String, TextEvent> textEventMap;
+	
+	private String key;
 	
 	private TextEvent eventPlaying;
 	
@@ -20,23 +25,25 @@ public class TextEventListener {
 	
 	public void add(String s){
 		
-		String[] dat = s.split("|");
+		String[] dat = s.split("[|]");
 		String coord = dat[0] + ", " + dat[1];
 		
 		String speaker = dat[2];
 		String message = dat[3];
-		TextEvent temp = new TextEvent(speaker, message);
+		TextEvent temp = new TextEvent(message, speaker);
 		
 		textEventMap.put(coord, temp);
 		
 	}
 	
 	public void playMessage(int x, int y){
+		
 		String coord = x + ", " + y;
 		TextEvent temp = textEventMap.get(coord);
 		if (temp != null){
 			eventPlaying = temp;
 			isEventPlaying = true;
+			key = coord;
 		} else {
 			eventPlaying = null;
 			isEventPlaying = false;
@@ -45,7 +52,7 @@ public class TextEventListener {
 	
 	public boolean isPlaying(){ return isEventPlaying; }
 	
-	public void updateMessage(){
+	public void update(){
 		if (isEventPlaying){
 			eventPlaying.update(); 
 		}
@@ -60,8 +67,8 @@ public class TextEventListener {
 	public void keyPressed(int keyCode){
 		if (keyCode == KeyEvent.VK_SPACE && eventPlaying != null){
 			if (eventPlaying.isDone()){
+				textEventMap.remove(key);
 				isEventPlaying = false;
-				textEventMap.remove(eventPlaying);
 			} else {
 				eventPlaying.finish();
 			}

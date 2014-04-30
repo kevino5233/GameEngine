@@ -23,8 +23,8 @@ public class GameStateManager {
 	//add the other levelstates later
 	
 	public GameStateManager(){
-		gameStates[0] = new MenuState(this);
-		gameStates[1] = new HubState(this);
+		gameStates[MENUSTATE] = new MenuState(this);
+		gameStates[HUBSTATE] = new HubState(this);
 		setState(0);
 		//initialize menustate
 	}

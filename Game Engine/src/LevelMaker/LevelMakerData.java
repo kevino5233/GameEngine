@@ -46,12 +46,6 @@ public class LevelMakerData {
 			}
 			contents += '\n';
 		}
-		for (int j = 0; j < tileTypes.length; j++){
-			for (int i = 0; i < tileTypes[0].length; i++){
-				contents += tileTypes[j][i] + " ";
-			}
-			contents += '\n';
-		}
 		for (int j = 0; j < enemyData.length; j++){
 			for (int i = 0; i < enemyData[0].length; i++){
 				if (enemyData[j][i] == null){
