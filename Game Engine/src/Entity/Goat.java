@@ -9,6 +9,7 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 
 import Main.GamePanel;
+import TileMap.Tile;
 import TileMap.TileMap;
 
 public class Goat extends Enemy{
@@ -16,13 +17,11 @@ public class Goat extends Enemy{
 	private static final int IDLE = 0;
 	private static final int WALKING = 1;
 	
-	private int startX, endX;
+	private long numFramesToFreeze, numFramesUntilFreeze, numFramesFreeze, numFramesFrozen;
+	
+	private int x1, x2;
 	
 	private int maxHealth, health;
-	
-	private double activateDistance;
-	
-	private boolean attacking;
 	
 	private BufferedImage[][] spriteSheet;
 	private int[] numFrames = {1, 4};
@@ -30,14 +29,36 @@ public class Goat extends Enemy{
 	public Goat(TileMap tm, double x, double y) {
 		super(tm, x, y);
 		
-		startX = endX = (int)x;
+		int startX = (int)x / tm.getTileSize();
+		int startY = (int)y / tm.getTileSize();
+		
+		int tempX = startX;
+		
+		do{
+			tempX--;
+			System.out.println(tempX);
+		}while(tileMap.getTile(tempX, startY).getType() != Tile.BLOCKING &&
+			   tileMap.getTile(tempX, startY + 1).getType() == Tile.BLOCKING);
+		
+		x1 = tempX * tileSize;
+		
+		tempX = startX;
+		
+		do{
+			tempX++;
+		}while(tileMap.getTile(tempX, startY).getType() != Tile.BLOCKING &&
+			   tileMap.getTile(tempX, startY + 1).getType() == Tile.BLOCKING);
+		
+		x2 = (tempX - 1) * tileSize - width;
 		
 		width = 32;
 		height = 16;
 		
-		right = true;
-		
 		active = false;
+
+		dx = 1;
+		
+		right = true;
 		
 		spriteSheet = new BufferedImage[4][];
 
@@ -60,12 +81,10 @@ public class Goat extends Enemy{
 			e.printStackTrace();
 		}
 
-		currentState = IDLE;
-		
 		animatino = new Animation();
 		
-		animatino.setFrames(spriteSheet[IDLE], 10);
-		
+		currentState = WALKING;
+		animatino.setFrames(spriteSheet[WALKING * 2 + 1], 3);
 	}
 
 	@Override
@@ -76,92 +95,62 @@ public class Goat extends Enemy{
 		if (code != -1){
 			sp.takeDamage(3);
 		}
-		if (x == endX){
-			int deltaX = endX - startX;
-
-			startX = endX;
-
-			if (attacking){
-				
-				attacking = false;
-
-				endX = startX + deltaX;
-
-				dx = 1;
-				dy = 1;
-
-				if (deltaX < 0) dx = -1;
-				if (endX < 0) endX = 0;
-
-				//System.out.println("Retreating");
-				//System.out.println(endX + " " + endY);
-				//System.out.println(dx + " " + dy);
-			} else {
-
-				attacking = true;
-
-				endX = sp.getX();
-
-				deltaX = endX - startX;
-
-				dx = 1;
-				dy = 1;
-
-				if (deltaX < 0) dx = -1;
-				if (endX < 0) endX = 0;
-
-				//System.out.println("Attacking");
-				//System.out.println(deltaX + " " + deltaY);
-				//System.out.println(startX + ", "  + startY + "-->" + endX + " " + endY);
-				//System.out.println(dx + " " + dy);
-			}
-		} else {
-			if ((dx > 0 && x >= endX) ||
-				(dx < 0 && x <= endX)){
-				dx = 0;
-				x = endX;
-			}
-		}
-
-		x += dx;
-
-		if (x < 0) x = 0;
-
-		tileMap.testTouch(this);
 		
+		if (dx > 0 && x >= x2){
+			x = x2;
+			dx = -1;
+			right = false;
+			animatino.setFrames(spriteSheet[WALKING * 2], 3);
+		} else if (dx < 0 && x <= x1){
+			x = x1;
+			dx = 1;
+			right = true;
+			animatino.setFrames(spriteSheet[WALKING * 2 + 1], 3);
+		}
+		
+		x += dx;
+		
+		
+	}
+	
+	public void resetFreezeFrames(){
+		numFramesToFreeze = System.currentTimeMillis() % 600;
+		numFramesUntilFreeze = 0;
+		numFramesFreeze = System.currentTimeMillis() % 300;
+		numFramesFrozen = 0;
+		currentState = WALKING;
+		if (right){
+			dx = 1;
+			animatino.setFrames(spriteSheet[WALKING * 2 + 1], 3);
+		} else {
+			dx = -1;
+			animatino.setFrames(spriteSheet[WALKING * 2], 3);
+		}
 	}
 
 	@Override
 	public void spawn() {
 		// TODO Auto-generated method stub
+		resetFreezeFrames();
 		x = spawnX;
 		y = spawnY;
 		active = true;
-		currentState = IDLE;
-		animatino.setFrames(spriteSheet[IDLE], 10);
 	}
 
 	@Override
 	public void update() {
 		// TODO Auto-generated method stub
-		right = dx > 0;
-		if (Math.abs(dx) > 0){
-			if (currentState != WALKING){
-				currentState = WALKING;
-				if (right){
-					animatino.setFrames(spriteSheet[WALKING * 2], 10);
-				} else {
-					animatino.setFrames(spriteSheet[WALKING * 2 + 1], 10);
-				}
-			}
-		} else {
+		if (numFramesUntilFreeze++ >= numFramesToFreeze){
 			if (currentState != IDLE){
 				currentState = IDLE;
+				dx = 0;
 				if (right){
-					animatino.setFrames(spriteSheet[IDLE * 2], 10);
-				} else {
 					animatino.setFrames(spriteSheet[IDLE * 2 + 1], 10);
+				} else {
+					animatino.setFrames(spriteSheet[IDLE * 2], 10);
 				}
+			} else if (numFramesFrozen++ >= numFramesFreeze){
+				resetFreezeFrames();
 			}
 		}
 		animatino.update();
@@ -191,28 +180,7 @@ public class Goat extends Enemy{
 
 	@Override
 	public void collide(Rectangle rec, int code) {
-		// TODO Auto-generated method stub
-		switch(code){
-		case -1 : 
-			dx *= -1;
-			break;
-		case Sprite.UP : 
-						y = rec.getY() - getHeight();
-						if (y < 0){
-							y = 0;
-						}
-						break;
-		case Sprite.DOWN : 
-							y = rec.getY() + rec.getHeight();
-							break;
-		case Sprite.RIGHT : 
-							x = rec.getX() + rec.getWidth();
-							break;
-		case Sprite.LEFT : 
-							x = rec.getX() - getWidth();
-							if (x < 0) x = 0;
-							break;
-		}
+		
 	}
 
 }
