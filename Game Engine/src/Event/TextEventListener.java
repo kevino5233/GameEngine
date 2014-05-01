@@ -30,7 +30,7 @@ public class TextEventListener {
 		
 		String speaker = dat[2];
 		String message = dat[3];
-		TextEvent temp = new TextEvent(message, speaker);
+		TextEvent temp = new TextEvent(speaker, message);
 		
 		textEventMap.put(coord, temp);
 		

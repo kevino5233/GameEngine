@@ -11,16 +11,19 @@ import java.io.File;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 import javax.swing.Timer;
 
+import LevelMaker.Main;
 import Main.GamePanel;
 
 public class MenuState extends GameState implements ActionListener{
 
 	BufferedImage bg;
 	
-	private int pos = 0;
+	private int pos;
 	private int dpos;
 	private String[] options = { "Start", "Help", "Quit" };
 	
@@ -30,25 +33,29 @@ public class MenuState extends GameState implements ActionListener{
 	private Timer timer;
 	
 	public MenuState(GameStateManager gsm){
-		this.gsm = gsm;
+		this.gsm = gsm;	
 		
+		titleColor = new Color(0, 64, 128);
+		titleFont = new Font("Comic Sans MS", Font.PLAIN, 28);
 		
-	}
-	
-	@Override
-	public void init() {
+		timer = new Timer(500, this);
 		try{
 			bg = ImageIO.read(new File("./Resources/Backgrounds/background.png"));
 			
-			titleColor = new Color(0, 64, 128);
 			
-			titleFont = new Font("Comic Sans MS", Font.PLAIN, 28);
 		} catch (IOException e){
 			e.printStackTrace();
 			System.out.println("you done fucked up");
 		}
 		
-		timer = new Timer(500, this);
+	}
+	
+	@Override
+	public void init() {
+
+		pos = 0;
+		dpos = 0;
+		
 		timer.setInitialDelay(0);
 		
 	}

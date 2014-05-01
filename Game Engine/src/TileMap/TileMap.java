@@ -117,67 +117,7 @@ public class TileMap {
 	public Tile getTile(int x, int y){ return tiles[y][x]; }
 	//public Enemy getEnemy(int x, int y) return enemySpawns[y][x]; }
 	
-	public void testTouch(Sprite sp){
 		
-		//IT FUCKING WORKS. THANK GOD.
-		//JK CAN'T LAND BETWEEN PLATFORMS GGGGGG
-		
-		int x = sp.getX() / tileSize;
-		int x2 = (sp.getX() + sp.getWidth()) / tileSize;
-		int y = sp.getY() / tileSize;
-		int y2 = (sp.getY() + sp.getHeight()) / tileSize;
-
-		int code = -1;
-		
-		Rectangle rec = new Rectangle(0, 0, 0, 0);
-		
-		if (getTile(x, y).getType() == Tile.BLOCKING){
-        	int temp = Sprite.isTouching(
-        			new Rectangle(x * tileSize, y*tileSize, tileSize, tileSize),
-        			new Rectangle(sp.getX(), sp.getY(), sp.getWidth(), sp.getHeight())
-        			);
-        	if (temp > code) {
-        		code = temp;
-        		rec = new Rectangle(x * tileSize, y*tileSize, tileSize, tileSize);
-        	}
-        }
-		
-        if (x2 < getCols() && getTile(x2, y).getType() == Tile.BLOCKING){
-        	int temp = Sprite.isTouching(
-        			new Rectangle(x2 * tileSize, y * tileSize, tileSize, tileSize),
-        			new Rectangle(sp.getX(), sp.getY(), sp.getWidth(), sp.getHeight())
-        			);
-        	if (temp > code) {
-        		code = temp;
-        		rec = new Rectangle(x2 * tileSize, y * tileSize, tileSize, tileSize);
-        	}
-        }
-        
-        if (y2 < getRows() && getTile(x, y2).getType() == Tile.BLOCKING){
-        	int temp = Sprite.isTouching(
-        			new Rectangle(x * tileSize, y2 * tileSize, tileSize, tileSize),
-        			new Rectangle(sp.getX(), sp.getY(), sp.getWidth(), sp.getHeight())
-        			);
-        	if (temp > code) {
-        		code = temp;
-        		rec = new Rectangle(x * tileSize, y2 * tileSize, tileSize, tileSize);
-        	}
-        }
-
-        if (x2 < getCols() && y2 < getRows() && getTile(x2, y2).getType() == Tile.BLOCKING){
-        	int temp = Sprite.isTouching(
-        			new Rectangle(x2 * tileSize, y2 * tileSize, tileSize, tileSize),
-        			new Rectangle(sp.getX(),sp.getY(), sp.getWidth(), sp.getHeight())
-        			);
-        	if (temp > code) {
-        		code = temp;
-        		rec = new Rectangle(x2 * tileSize, y2 * tileSize, tileSize, tileSize);
-        	}
-        }
-        
-        sp.collide(rec, code);
-	}
-	
 	public void center(double x, double y){
 		camX = x - GamePanel.WIDTH / 2;
 		camY = y - GamePanel.HEIGHT / 2;
@@ -187,7 +127,103 @@ public class TileMap {
 		if (camY < 0) camY = 0;
 		if (camY > height - GamePanel.HEIGHT) camY = height - GamePanel.HEIGHT;
 		
+	}
+	
+	public void testTouch(Sprite sp){
+
+		testVerticalCollision(sp);
+		testHorizontalCollision(sp);
 		
+	}
+	
+	public void testVerticalCollision(Sprite sp){
+
+		int x1 = sp.getX() / tileSize;
+		int x2 = (sp.getX() + sp.getWidth()) / tileSize;
+		int y1 = sp.getY() / tileSize;
+		int y2 = (sp.getY() + sp.getHeight()) / tileSize;
+		
+		if (getTile(x1, y1).getType() == Tile.BLOCKING){
+        	int code = Sprite.isTouchingVertically(
+        			new Rectangle(x1 * tileSize, y1*tileSize, tileSize, tileSize),
+        			new Rectangle(sp.getX(), sp.getY(), sp.getWidth(), sp.getHeight())
+        			);
+
+            if (code != -1) sp.collide(new Rectangle(x1 * tileSize, y1*tileSize, tileSize, tileSize), code);
+        }
+		
+		if (x2 < getCols() && getTile(x2, y1).getType() == Tile.BLOCKING){
+        	int code = Sprite.isTouchingVertically(
+        			new Rectangle(x2 * tileSize, y1 * tileSize, tileSize, tileSize),
+        			new Rectangle(sp.getX(), sp.getY(), sp.getWidth(), sp.getHeight())
+        			);
+
+            if (code != -1) sp.collide(new Rectangle(x2 * tileSize, y1 * tileSize, tileSize, tileSize), code);
+        }
+        
+        if (y2 < getRows() && getTile(x1, y2).getType() == Tile.BLOCKING){
+        	int code = Sprite.isTouchingVertically(
+        			new Rectangle(x1 * tileSize, y2 * tileSize, tileSize, tileSize),
+        			new Rectangle(sp.getX(), sp.getY(), sp.getWidth(), sp.getHeight())
+        			);
+
+            if (code != -1) sp.collide(new Rectangle(x1 * tileSize, y2 * tileSize, tileSize, tileSize), code);
+        }
+
+        if (x2 < getCols() && y2 < getRows() && getTile(x2, y2).getType() == Tile.BLOCKING){
+        	int code = Sprite.isTouchingVertically(
+        			new Rectangle(x2 * tileSize, y2 * tileSize, tileSize, tileSize),
+        			new Rectangle(sp.getX(),sp.getY(), sp.getWidth(), sp.getHeight())
+        			);
+        	
+            if (code != -1) sp.collide(new Rectangle(x2 * tileSize, y2 * tileSize, tileSize, tileSize), code);
+        }
+        
+	}
+	
+	public void testHorizontalCollision(Sprite sp){
+
+		int x1 = sp.getX() / tileSize;
+		int x2 = (sp.getX() + sp.getWidth()) / tileSize;
+		int y1 = sp.getY() / tileSize;
+		int y2 = (sp.getY() + sp.getHeight()) / tileSize;
+		
+		if (getTile(x1, y1).getType() == Tile.BLOCKING){
+        	int code = Sprite.isTouchingHorizontally(
+        			new Rectangle(x1 * tileSize, y1*tileSize, tileSize, tileSize),
+        			new Rectangle(sp.getX(), sp.getY(), sp.getWidth(), sp.getHeight())
+        			);
+
+            if (code != -1) sp.collide(new Rectangle(x1 * tileSize, y1*tileSize, tileSize, tileSize), code);
+        }
+		
+		if (x2 < getCols() && getTile(x2, y1).getType() == Tile.BLOCKING){
+        	int code = Sprite.isTouchingHorizontally(
+        			new Rectangle(x2 * tileSize, y1 * tileSize, tileSize, tileSize),
+        			new Rectangle(sp.getX(), sp.getY(), sp.getWidth(), sp.getHeight())
+        			);
+
+            if (code != -1) sp.collide(new Rectangle(x2 * tileSize, y1 * tileSize, tileSize, tileSize), code);
+        }
+        
+        if (y2 < getRows() && getTile(x1, y2).getType() == Tile.BLOCKING){
+        	int code = Sprite.isTouchingHorizontally(
+        			new Rectangle(x1 * tileSize, y2 * tileSize, tileSize, tileSize),
+        			new Rectangle(sp.getX(), sp.getY(), sp.getWidth(), sp.getHeight())
+        			);
+
+            if (code != -1) sp.collide(new Rectangle(x1 * tileSize, y2 * tileSize, tileSize, tileSize), code);
+        }
+
+        if (x2 < getCols() && y2 < getRows() && getTile(x2, y2).getType() == Tile.BLOCKING){
+        	int code = Sprite.isTouchingHorizontally(
+        			new Rectangle(x2 * tileSize, y2 * tileSize, tileSize, tileSize),
+        			new Rectangle(sp.getX(),sp.getY(), sp.getWidth(), sp.getHeight())
+        			);
+        	
+            if (code != -1) sp.collide(new Rectangle(x2 * tileSize, y2 * tileSize, tileSize, tileSize), code);
+        }
+        
 	}
 	
 	public void update(Player player){
@@ -268,7 +304,6 @@ public class TileMap {
 				e.getX() > camX + GamePanel.WIDTH || 
 				e.getY() + e.getHeight() < camY || 
 				e.getY() > camY + GamePanel.HEIGHT){
-				System.out.println("Enemy dying");
 				e.die();
 				liveEnemies.remove(i);
 			} else {

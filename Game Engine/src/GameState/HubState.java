@@ -1,6 +1,7 @@
 package GameState;
 
 import java.awt.Graphics2D;
+import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -52,6 +53,8 @@ public class HubState extends GameState{
 		for (String s : textEvents){
 			textEventListener.add(s);
 		}
+		
+		paused = false;
 	}
 
 	@Override
@@ -66,7 +69,7 @@ public class HubState extends GameState{
 				textEventListener.update();
 			}	
 		}
-		if (tileMap != null && player != null && !textEventListener.isPlaying()){
+		if (tileMap != null && player != null && !paused && !textEventListener.isPlaying()){
 			player.update();
 			tileMap.update(player);
 		}
@@ -82,11 +85,12 @@ public class HubState extends GameState{
 //					0, 
 //					null
 //					);
-			if (tileMap != null && player != null && textEventListener != null){
-				tileMap.draw(g);
-				player.draw(g);
-				if (textEventListener.isPlaying()){
+			if (tileMap != null && player != null && !paused){
+				if (textEventListener != null && textEventListener.isPlaying()){
 					textEventListener.draw(g);
+				} else {
+					tileMap.draw(g);
+					player.draw(g);
 				}
 			}
 		} catch (NullPointerException e){
@@ -99,8 +103,14 @@ public class HubState extends GameState{
 
 	@Override
 	public void keyPressed(int k) {
+		if (k == KeyEvent.VK_SPACE){
+			if (textEventListener.isPlaying()){
+				textEventListener.keyPressed(k);
+			} else {
+				paused = !paused;
+			}
+		}
 		player.keyPressed(k);
-		textEventListener.keyPressed(k);
 	}
 
 	@Override

@@ -4,6 +4,8 @@ public abstract class GameState {
 
 	protected GameStateManager gsm;
 	
+	protected boolean paused;
+	
 	//initializes variables and stuff
 	public abstract void init();
 	
