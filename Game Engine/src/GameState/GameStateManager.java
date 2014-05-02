@@ -2,18 +2,18 @@ package GameState;
 
 public class GameStateManager {
 
-	private static GameState[] gameStates = new GameState[2];
+	private static GameState[] gameStates = new GameState[5];
 	
 	private int currentState;
 	
 	private static int difficulty = 0;
 	
-	private static final int MENUSTATE = 0;
-	private static final int HUBSTATE= 1;
-	private static final int FIRESTATE = 2;
-	private static final int WATERSTATE = 3;
-	private static final int EARTHSTATE = 4;
-	private static final int AIRSTATE = 5;
+	public static final int MENUSTATE = 0;
+	public static final int HUBSTATE= 1;
+	public static final int FIRESTATE = 2;
+	public static final int WATERSTATE = 3;
+	public static final int EARTHSTATE = 4;
+	public static final int AIRSTATE = 5;
 	
 	private static boolean fire,
 						   water,
@@ -25,6 +25,7 @@ public class GameStateManager {
 	public GameStateManager(){
 		gameStates[MENUSTATE] = new MenuState(this);
 		gameStates[HUBSTATE] = new HubState(this);
+		gameStates[EARTHSTATE] = new EarthState(this);
 		setState(0);
 		//initialize menustate
 	}

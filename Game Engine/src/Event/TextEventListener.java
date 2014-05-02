@@ -26,6 +26,7 @@ public class TextEventListener {
 	public void add(String s){
 		
 		String[] dat = s.split("[|]");
+		if (dat.length < 4) return;
 		String coord = dat[0] + ", " + dat[1];
 		
 		String speaker = dat[2];
@@ -48,6 +49,13 @@ public class TextEventListener {
 			eventPlaying = null;
 			isEventPlaying = false;
 		}
+	}
+	
+	public void playMessage(TextEvent event){
+		
+		eventPlaying = event;
+		isEventPlaying = true;
+		
 	}
 	
 	public boolean isPlaying(){ return isEventPlaying; }

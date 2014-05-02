@@ -2,8 +2,43 @@ package Entity;
 
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.FloatControl;
+import javax.sound.sampled.LineEvent;
+import javax.sound.sampled.LineEvent.Type;
+import javax.sound.sampled.LineListener;
 
 import TileMap.TileMap;
+
+class AudioListener implements LineListener{
+
+	private boolean done = false;
+	
+	@Override
+	public void update(LineEvent event) {
+		Type eventType = event.getType();
+		if (eventType == Type.STOP || eventType == Type.CLOSE){
+			done = true;
+			notifyAll();
+		}
+	}
+	
+	public synchronized void waitUntilDone() throws InterruptedException {
+		while(!done){
+			wait();
+		}
+	}
+	
+	
+	
+}
 
 public abstract class Sprite{
 	
@@ -34,9 +69,14 @@ public abstract class Sprite{
 
     public int getX(){ return (int)x; }
     public int getY(){ return (int)y; }
+    public int getHealth(){ return health; }
+    public int getMaxHealth(){ return maxHealth; }
     public int getWidth(){ return width; }
     public int getHeight(){ return height;} 
-    
+	public boolean isAscending(){ return dy < 0; }
+	public boolean isDead(){ return health <= 0; }
+	public Rectangle getHitbox(){ return new Rectangle(width, height, getX(), getY()); }
+	
     public void takeDamage(int damage){
     	health -= damage;
 		if (health < 0){
@@ -48,7 +88,7 @@ public abstract class Sprite{
     public abstract void update();
     public abstract void die();
     public abstract void init();
-    public abstract void  draw(Graphics2D g);
+    public abstract void draw(Graphics2D g);
     
     public abstract void collide(Rectangle rec, int code);
     
@@ -150,6 +190,38 @@ public abstract class Sprite{
 			return RIGHT;
 		}
         return -1;
+       
+    }
+    
+    public static synchronized void playSound(final File file) {
+		  new Thread(new Runnable() {
+		  // The wrapper thread is unnecessary, unless it blocks on the
+		  // Clip finishing; see comments.
+		    public void run() {
+		      try {
+		    	  InputStream audioSrc = new FileInputStream(file);
+		    	  BufferedInputStream inputStream = new BufferedInputStream(audioSrc);
+		    	  AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(inputStream);
+
+		    	  AudioListener listener = new AudioListener();
+
+		    	  Clip clip = AudioSystem.getClip();
+		    	  clip.addLineListener(listener);
+		    	  clip.open(audioInputStream);
+		    	  FloatControl gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
+		    	  gainControl.setValue(-20.0f);		    	  
+		    	  clip.start();
+
+		    	  listener.waitUntilDone();	
+		    	  	
+		    	  clip.stop();
+		    	  clip.close();
+		    	  
+		      } catch (Exception e) {
+		    	  e.printStackTrace();
+		      }
+		    }
+		  }).start();
     }
 }
 

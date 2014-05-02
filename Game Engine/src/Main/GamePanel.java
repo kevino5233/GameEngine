@@ -70,12 +70,6 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 
 	@Override
 	public void keyPressed(KeyEvent e) {
-		if (e.getKeyCode() == KeyEvent.VK_ESCAPE){
-			if (running){
-				running = false;
-				System.exit(0);
-			}
-		}
 		gsm.keyPressed(e.getKeyCode());
 		
 	}

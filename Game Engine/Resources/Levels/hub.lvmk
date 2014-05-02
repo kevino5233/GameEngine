@@ -160,5 +160,5 @@ None None None None None None None None None None None None None None None None 
 None None None None None None None None None None None None None None None None None None None None None None None None None None None None None None None None 
 None None None None None None None None None None None None None None None None None None None None None None None None None None None None None None None None 
 None None None None None None None None None None None None None None None None None None None None None None None None None None None None None None None None 
-3|3|Wow, a text event!|John
-7|4|You made it past the bat, good job!|John
+3|3|John|Wow, a text event!
+7|4|John|You made it past the bat, good job!

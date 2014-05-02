@@ -13,7 +13,7 @@ public abstract class Enemy extends Sprite{
 		
 	}
 	
-	public abstract void getNextPosition(Sprite sp);
+	public abstract void getNextPosition(Player sp);
 	
 	public Enemy(TileMap tm, double x, double y){
 		this(tm);

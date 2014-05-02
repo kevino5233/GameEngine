@@ -8,12 +8,14 @@ public class Animation{
 	private int framesWaited;
 	private int framesDelay;
 	
-	private boolean playedOnce;
+	private boolean playedOnce, stopped;
 	
 	private BufferedImage[] frames;
 	
 	public Animation(){
 		playedOnce = false;
+		stopped = true;
+		pos = 0;
 	}
 	
 	public void setFrames(BufferedImage[] frames, int delay){
@@ -21,11 +23,12 @@ public class Animation{
 		this.frames = frames;
 		framesWaited = 0;
 		framesDelay = delay;
+		stopped = false;
 		playedOnce = false;
 	}
 	
 	public void update(){
-		if (framesWaited++ == framesDelay){
+		if (!stopped && framesWaited++ == framesDelay){
 			framesWaited = 0;
 			pos++;
 			if (pos == frames.length) playedOnce = true;
@@ -37,8 +40,11 @@ public class Animation{
 		pos = i % frames.length;
 	}
 	
+	public void stop(){ stopped = true; }
+	
 	public int getFrame(){ return pos; }
 	public BufferedImage getImage(){ return frames[pos]; }
 	public boolean hasPlayedOnce(){ return playedOnce; }
+	public boolean stopped(){ return stopped; }
 	
 }

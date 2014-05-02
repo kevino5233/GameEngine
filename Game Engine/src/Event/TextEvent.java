@@ -3,22 +3,36 @@ package Event;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+
+import javax.imageio.ImageIO;
 
 import Main.GamePanel;
 
 public class TextEvent {
 
+	private BufferedImage box;
+	
 	private String message,
 				   display, 
 				   speaker;
 	
 	private boolean done;
 	
-	public TextEvent(String m, String s){
+	public TextEvent(String s, String m){
 		message = m;
 		display = "";
 		speaker = s;
 		done = false;
+		
+		try{
+			box = ImageIO.read(new File("./Resources/Sprites/Objects/Textbox.png"));
+		} catch (IOException e){
+			System.out.println("Couldn't find the file");
+		}
+		
 	}
 	
 	public String getMessage(){ return message; }
@@ -34,15 +48,14 @@ public class TextEvent {
 	
 	public void draw(Graphics2D g){
 		
-		g.setColor(new Color(0x66ccff));
-		g.fillRect(50, 10, GamePanel.WIDTH * GamePanel.SCALE - 100, 50);
+		g.drawImage(box, 50, 10, null);
 		g.setColor(Color.BLACK);
 		g.setFont(new Font("Arial", Font.BOLD, 10));
-		g.drawString(speaker, 55, 20);
+		g.drawString(speaker, 100, 40);
 		g.setFont(new Font("Arial", Font.PLAIN, 10));
-		g.drawString(display, 60, 30);
+		g.drawString(display, 110, 50);
 		if (done) {
-			g.drawString("Press space to continue", GamePanel.WIDTH * GamePanel.SCALE - 175, 50);
+			g.drawString("Press space to continue", GamePanel.WIDTH * GamePanel.SCALE - 250, 95);
 		}
 		
 	}

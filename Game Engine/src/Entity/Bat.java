@@ -41,6 +41,8 @@ public class Bat extends Enemy{
 		
 		terminalVelocity = 2;
 		
+		maxHealth = 3;
+		
 		spriteSheet = new BufferedImage[2][];
 		
 		try{
@@ -69,13 +71,20 @@ public class Bat extends Enemy{
 		
 	}
 	
-	public void getNextPosition(Sprite sp){
+	public void getNextPosition(Player sp){
+		
+		if (sp.isAttacking() && sp.getHitbox().contains(x, y)){
+			playSound(new File("./Resources/Sound/Player/sword_impact.wav"));
+			takeDamage(3);
+		}
+		
 		int code = Sprite.isTouching(new Rectangle((int)x, (int)y, width, height),
 				  					 new Rectangle(sp.getX(), sp.getY(), sp.getWidth(), sp.getHeight())
 				 					);
 		if (code != -1){
 			sp.takeDamage(3);
 		}
+		
 		if (x == endX && y == endY){
 			int deltaX = endX - startX;
 			int deltaY = endY - startY;
@@ -154,6 +163,7 @@ public class Bat extends Enemy{
 		startX = endX = (int)x;
 		startY = endY = (int)y;
 		currentState = FLYING;
+		health = maxHealth;
 		active = true;
 	}
 
@@ -165,6 +175,7 @@ public class Bat extends Enemy{
 	@Override
 	public void die() {
 		active = false;
+		tileMap.removeEnemy(this);
 	}
 
 	@Override

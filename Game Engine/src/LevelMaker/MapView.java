@@ -86,8 +86,8 @@ public class MapView extends JComponent implements MouseListener{
 
 		int res = SIDE / tilesAcross[resNum];
 		
-		x = (x + camX) / res;
-		y = (y + camY) / res;
+		x = x / res + camX;
+		y = y / res + camY;
 		
 		tiles[y][x] = tile;
 		levelData[y][x] = tile_num;
@@ -99,8 +99,8 @@ public class MapView extends JComponent implements MouseListener{
 	public void addTextEvent(int x, int y, String speaker, String message){
 		int res = SIDE / tilesAcross[resNum];
 		
-		x = (x + camX) / res;
-		y = (y + camY) / res;
+		x = x / res + camX;
+		y = y / res + camY;
 		
 		textEvents[y][x] = new TextEvent(message, speaker);
 	}
@@ -158,8 +158,8 @@ public class MapView extends JComponent implements MouseListener{
 	public TextEvent getTextEvent(int x, int y){
 		int res = SIDE / tilesAcross[resNum];
 		
-		x = (x + camX) / res;
-		y = (y + camX) / res;
+		x = x / res + camX;
+		y = y / res + camY;
 		
 		return textEvents[y][x];
 	}
@@ -179,7 +179,7 @@ public class MapView extends JComponent implements MouseListener{
 				int tile_type = levelData[j][i];
 				tiles[j][i] = tileMap.getSubimage(
 						tile_type % tiles_horizontally_across * 16,
-						tile_type / tiles_vertically_across * 16,
+						tile_type / tiles_horizontally_across * 16,
 						16,
 						16
 				);

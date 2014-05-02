@@ -34,7 +34,7 @@ public class Spike extends Enemy{
 	}
 	
 	@Override
-	public void getNextPosition(Sprite sp) {
+	public void getNextPosition(Player sp) {
 		int code = Sprite.isTouching(new Rectangle((int)x, (int)y, width, height),
 					 new Rectangle(sp.getX(), sp.getY(), sp.getWidth(), sp.getHeight())
 				);

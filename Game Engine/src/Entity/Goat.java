@@ -16,12 +16,12 @@ public class Goat extends Enemy{
 
 	private static final int IDLE = 0;
 	private static final int WALKING = 1;
+
+	private int framesInvincible, framesLeftInvincible;
 	
 	private long numFramesToFreeze, numFramesUntilFreeze, numFramesFreeze, numFramesFrozen;
 	
 	private int x1, x2;
-	
-	private int maxHealth, health;
 	
 	private BufferedImage[][] spriteSheet;
 	private int[] numFrames = {1, 4};
@@ -60,6 +60,10 @@ public class Goat extends Enemy{
 		
 		right = true;
 		
+		maxHealth = 10;
+		
+		framesInvincible = 20;
+		
 		spriteSheet = new BufferedImage[4][];
 
 		try{
@@ -88,7 +92,17 @@ public class Goat extends Enemy{
 	}
 
 	@Override
-	public void getNextPosition(Sprite sp) {
+	public void getNextPosition(Player sp) {
+		
+		if (framesLeftInvincible-- <= 0 && 
+			sp.isAttacking() && 
+			sp.getHitbox().intersects(new Rectangle(getX(), getY(), width, height))
+		   ){
+			playSound(new File("./Resources/Sound/Player/sword_impact.wav"));
+			framesLeftInvincible = framesInvincible;
+			takeDamage(3);
+		}
+		
 		int code = Sprite.isTouching(new Rectangle((int)x, (int)y, width, height),
 									 new Rectangle(sp.getX(), sp.getY(), sp.getWidth(), sp.getHeight())
 									);
@@ -134,6 +148,7 @@ public class Goat extends Enemy{
 		resetFreezeFrames();
 		x = spawnX;
 		y = spawnY;
+		health = maxHealth;
 		active = true;
 	}
 
@@ -158,8 +173,8 @@ public class Goat extends Enemy{
 
 	@Override
 	public void die() {
-		// TODO Auto-generated method stub
 		active = false;
+		tileMap.removeEnemy(this);
 	}
 
 	@Override
@@ -181,6 +196,10 @@ public class Goat extends Enemy{
 	@Override
 	public void collide(Rectangle rec, int code) {
 		
+	}
+	
+	public String toString(){
+		return "Goat don't give a fuck";
 	}
 
 }
