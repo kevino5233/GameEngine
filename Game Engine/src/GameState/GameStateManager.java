@@ -1,8 +1,16 @@
 package GameState;
 
+import java.awt.Font;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+
 public class GameStateManager {
 
 	private static GameState[] gameStates = new GameState[5];
+	
+	private String username, password;
 	
 	private int currentState;
 	
@@ -25,7 +33,12 @@ public class GameStateManager {
 	public GameStateManager(){
 		gameStates[MENUSTATE] = new MenuState(this);
 		gameStates[HUBSTATE] = new HubState(this);
+		gameStates[FIRESTATE] = new FireState(this);
 		gameStates[EARTHSTATE] = new EarthState(this);
+		
+		username = "";
+		password = "";
+		
 		setState(0);
 		//initialize menustate
 	}
@@ -35,13 +48,43 @@ public class GameStateManager {
 		gameStates[currentState].init();
 	}
 	
+	public void setUser(String username, String password){
+		this.username = username;
+		this.password = password;
+	}
+	
+	public String getUsername(){ return username; }
+	public String getPassword(){ return password; }
+	
 	public void complete(int state){
 		difficulty++;
 		switch(state){
-		case FIRESTATE : fire = true;
-		case WATERSTATE : water = true;
-		case EARTHSTATE : earth = true;
-		case AIRSTATE : air = true;
+		case FIRESTATE : fire = true; break;
+		case WATERSTATE : water = true; break;
+		case EARTHSTATE : earth = true; break;
+		case AIRSTATE : air = true; break;
+		}
+		try{
+			File profile = new File("Save Profiles/" + getUsername() + ".gg");
+			FileWriter fileWriter = new FileWriter(profile);
+			BufferedWriter writer = new BufferedWriter(fileWriter);
+			
+			String levels = "";
+			levels += air ? '1' : '0';
+			levels += fire ? '1' : '0';
+			levels += water ? '1' : '0';
+			levels += earth ? '1' : '0';
+			
+			writer.write(getUsername() + " " + getPassword() + " " + levels);
+			
+			writer.close();
+			
+		} catch (IOException e){
+			System.out.println("Trouble getting shit done GSM");
+			e.printStackTrace();
+		} catch (Exception e){
+			System.out.println("Some other error GSM");
+			e.printStackTrace();
 		}
 	}
 	
@@ -51,6 +94,7 @@ public class GameStateManager {
 	
 	public void draw(java.awt.Graphics2D g){
 		gameStates[currentState].draw(g);
+		g.setFont(new Font("Arial", Font.PLAIN, 10));
 	}
 	
 

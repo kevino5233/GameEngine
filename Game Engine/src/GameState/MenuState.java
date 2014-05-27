@@ -7,10 +7,21 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Scanner;
 
 import javax.imageio.ImageIO;
+import javax.swing.GroupLayout;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JPasswordField;
+import javax.swing.JTextField;
 import javax.swing.Timer;
 
 import Main.GamePanel;
@@ -27,10 +38,18 @@ public class MenuState extends GameState implements ActionListener{
 	
 	private Timer timer;
 	
-	private int nextLevel;
-	
 	private boolean displayCredits;
 	private boolean displayControls;
+	
+	private JLabel usernameLabel, passwordLabel, infoLabel, invalidUserLabel;
+	
+	private JTextField usernameTextField;
+	
+	private JPasswordField passwordTextField;
+	
+	private JButton submitButton;
+	
+	private JFrame passwordFrame;
 	
 	public MenuState(GameStateManager gsm){
 		this.gsm = gsm;	
@@ -39,10 +58,65 @@ public class MenuState extends GameState implements ActionListener{
 		creditsFont = new Font("Times New Roman", Font.PLAIN, 15);
 		
 		timer = new Timer(500, this);
+		
+		usernameLabel = new JLabel("Username: ");
+		passwordLabel = new JLabel("Password: ");
+		invalidUserLabel = new JLabel("");
+		infoLabel = new JLabel("Your username will automatically be added if it hasn't yet");
+		
+		usernameTextField = new JTextField(30);
+		passwordTextField = new JPasswordField(30);
+		
+		submitButton = new JButton("Sign in");
+		submitButton.addActionListener(this);
+		
+		passwordFrame = new JFrame("Sign in");
+		
+		JPanel panel = new JPanel();
+		
+		GroupLayout layout = new GroupLayout(panel);
+		layout.setAutoCreateGaps(true);
+		layout.setAutoCreateContainerGaps(true);
+		panel.setLayout(layout);
+		
+		layout.setHorizontalGroup(
+				layout.createSequentialGroup()
+					.addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+							.addComponent(infoLabel)
+							.addComponent(usernameLabel)
+							.addComponent(passwordLabel)
+							.addComponent(invalidUserLabel)
+							.addComponent(submitButton)
+							)
+					.addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+							.addComponent(usernameTextField)
+							.addComponent(passwordTextField)
+							)
+				);
+		
+		layout.setVerticalGroup(
+				layout.createSequentialGroup()
+					.addComponent(infoLabel)
+					.addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+							.addComponent(usernameTextField)
+							.addComponent(usernameLabel)
+							)
+					.addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+							.addComponent(passwordTextField)
+							.addComponent(passwordLabel)
+							)
+					.addComponent(invalidUserLabel)
+					.addComponent(submitButton)
+				);
+		
+		passwordFrame.setContentPane(panel);
+		
 		try{
 			
-			bg = ImageIO.read(new File("./Resources/Backgrounds/background.png"));
-			
+			bg = ImageIO.read(
+					this.getClass().getResourceAsStream("/Resources/Backgrounds/Background.png")
+					);
+					
 		} catch (IOException e){
 			e.printStackTrace();
 			System.out.println("you done fucked up");
@@ -53,22 +127,23 @@ public class MenuState extends GameState implements ActionListener{
 	@Override
 	public void init() {
 
-		options = new String[3];
-		options[0] = "Play";
-		options[1] = "Credits";
-		options[2] = "Quit";
+		options = new String[1];
+		options[0] = "Press space to start";
 		
 		pos = 0;
 		dpos = 0;
 		
-		playSound(new File("./Resources/Sound/Music/hub.wav"));
+		gsm.setUser("", "");
+		
+		usernameTextField.setText("");
+		passwordTextField.setText("");
 		
 		displayCredits = false;
 		displayControls = false;
 		
 		timer.setInitialDelay(0);
 		
-		nextLevel = 0;
+		playSound("theme");
 		
 	}
 
@@ -146,16 +221,19 @@ public class MenuState extends GameState implements ActionListener{
 		} else if (k == KeyEvent.VK_DOWN){
 			dpos = 1;
 			timer.start();
-		} else if (k == KeyEvent.VK_ENTER){
+		} else if (k == KeyEvent.VK_SPACE || k == KeyEvent.VK_ENTER){
 			switch(options[pos]){
-			case "Play" : 
+			case "Press space to start" :
 				options = new String[3];
-				options[0] = "Earth Level";
-				options[1] = "Fire Level";
-				options[2] = "Back";
-				displayCredits = false;
-				displayControls = false;
+				options[0] = "Play";
+				options[1] = "Credits";
+				options[2] = "Quit";
 				pos = 0;
+				dpos = 0;
+				break;
+			case "Play" :
+				passwordFrame.pack();
+				passwordFrame.setVisible(true);
 				break;
 			case "Credits" : 
 				options = new String[1];
@@ -175,26 +253,7 @@ public class MenuState extends GameState implements ActionListener{
 				pos = 0;
 				break;
 			case "Okay" :
-				stopSound();
-				gsm.setState(nextLevel);
-				break;
-			case "Fire level" :
-//				nextLevel = GameStateManager.FIRESTATE;
-//				options = new String[2];
-//				options[0] = "Okay";
-//				options[1] = "Back";
-//				displayCredits = false;
-//				displayControls = true;
-//				pos = 0;
-				break;
-			case "Earth Level" :
-				nextLevel = GameStateManager.EARTHSTATE;
-				options = new String[2];
-				options[0] = "Okay";
-				options[1] = "Back";
-				displayCredits = false;
-				displayControls = true;
-				pos = 0;
+				gsm.setState(GameStateManager.HUBSTATE);
 				break;
 			}
 		}
@@ -207,12 +266,94 @@ public class MenuState extends GameState implements ActionListener{
 	}
 
 	@Override
-	public void actionPerformed(ActionEvent e) {
-		pos += dpos;
-		if (pos == options.length){
-			pos = options.length - 1;
-		} else if (pos < 0){
-			pos = 0;
+	public void actionPerformed(ActionEvent ae) {
+		if (ae.getSource() == submitButton){
+			
+			gsm.setUser(usernameTextField.getText(), String.valueOf(passwordTextField.getPassword()));
+
+			usernameTextField.setText("");
+			passwordTextField.setText("");
+			
+			try{
+				File saves = new File("Save Profiles");
+				if (!saves.exists()){
+					saves.mkdir();
+				}
+				File profile = new File( "Save Profiles/" + gsm.getUsername() + ".gg");
+				if (!profile.exists()){
+					profile.createNewFile();
+				}
+				
+				Scanner in = new Scanner(profile);
+
+
+				if (in.hasNext()){
+					String tempUsername = in.next();
+					String tempPassword = in.next();
+					char[] levels = in.next().toCharArray();
+					
+					if (tempUsername.equals(gsm.getUsername()) && tempPassword.equals(gsm.getPassword())){
+						if (levels[0] == '1') gsm.complete(GameStateManager.AIRSTATE);
+						if (levels[1] == '1') gsm.complete(GameStateManager.FIRESTATE);
+						if (levels[2] == '1') gsm.complete(GameStateManager.WATERSTATE);
+						if (levels[3] == '1') gsm.complete(GameStateManager.EARTHSTATE);
+						
+						passwordFrame.setVisible(false);
+						
+						options = new String[2];
+						options[0] = "Okay";
+						options[1] = "Back";
+						displayControls = true;
+						pos = 0;
+						
+					} else {
+						invalidUserLabel.setText("Invalid username or password");
+					}
+					
+					in.close();
+					
+					return;
+
+				}
+
+				
+				FileWriter fileWriter = new FileWriter(profile);
+				BufferedWriter writer = new BufferedWriter(fileWriter);
+				
+				writer.append(gsm.getUsername() + " " + gsm.getPassword() + " 0000");
+				
+				writer.close();
+				in.close();
+				
+				passwordFrame.setVisible(false);
+				
+				options = new String[2];
+				options[0] = "Okay";
+				options[1] = "Back";
+				displayControls = true;
+				pos = 0;
+				
+				return;
+				
+			} catch (FileNotFoundException e){
+				System.out.println("Could not find file goddamnit MenuState");
+				e.printStackTrace();
+			} catch (IOException e){
+				System.out.println("Could not make file or something");
+				e.printStackTrace();
+			} catch (Exception e){
+				System.out.println("Some other error");
+				e.printStackTrace();
+			}
+			
+			
+		} else {
+			pos += dpos;
+			if (pos == options.length){
+				pos = options.length - 1;
+			} else if (pos < 0){
+				pos = 0;
+			}
 		}
 	}
 	

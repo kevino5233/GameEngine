@@ -1,10 +1,12 @@
 package LevelMaker;
 
 import java.awt.image.BufferedImage;
-import java.io.File;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Scanner;
+import java.util.Arrays;
 
 import Event.TextEvent;
 
@@ -70,34 +72,58 @@ public class LevelMakerData {
 		return new LevelMakerData(tileMap, new int[rows][cols], new String[rows][cols], new ArrayList<String>());
 	}
 	
-	public static LevelMakerData parse(File f)throws IOException{
-		Scanner in = new Scanner(f);
-		int rows = in.nextInt();
-		int cols = in.nextInt();
+	public static LevelMakerData parse(String levelName)throws IOException{
+		
+		/*
+		 * Switch to InputStreamReader
+		 * parse until a space, then parse that String
+		 */
+		
+		InputStream in = Main.class.getResourceAsStream("/Resources/Levels/" + levelName + ".lvmk");		
+		System.out.println(in == null);
+		BufferedReader level = 
+				new BufferedReader(
+					new InputStreamReader(in)
+				);
+		String[] dat = level.readLine().split(" ");
+		int rows = Integer.parseInt(dat[0]);
+		int cols = Integer.parseInt(dat[1]);
 		BufferedImage tm = new BufferedImage(cols, rows, BufferedImage.TYPE_INT_RGB);
 		for (int j = 0; j < rows; j++){
+			dat = level.readLine().split(" ");
 			for (int i = 0; i < cols; i++){
-				tm.setRGB(i, j, in.nextInt());
+				tm.setRGB(i, j, Integer.parseInt(dat[i]));
 			}
 		}
-		int[][] tt = new int[in.nextInt()][in.nextInt()];
+		
+		dat = level.readLine().split(" ");
+		rows = Integer.parseInt(dat[0]);
+		cols = Integer.parseInt(dat[1]);
+		
+		int[][] tt = new int[rows][cols];
 		for (int j = 0; j < tt.length; j++){
+			dat = level.readLine().split(" ");
 			for (int i = 0; i < tt[0].length; i++){
-				tt[j][i] = in.nextInt();
+				tt[j][i] = Integer.parseInt(dat[i]);
 			}
 		}
 		String[][] ed = new String[tt.length][tt[0].length];
 		for (int j = 0; j < tt.length; j++){
+			dat = level.readLine().split(" ");
+			System.out.println(Arrays.toString(dat));
 			for (int i = 0; i < tt[0].length; i++){
-				ed[j][i] = in.next();
+				ed[j][i] = dat[i];
 			}
 		}
-		in.nextLine();
+		int num = 0;
+		try{
+			num = Integer.parseInt(level.readLine());
+		} catch (Exception e){}
 		ArrayList<String> ev = new ArrayList<String>();
-		while(in.hasNextLine()){
-			ev.add(in.nextLine());
+		while(num-- > 0){
+			ev.add(level.readLine());
 		}
-		in.close();
+		level.close();
 		return new LevelMakerData(tm, tt, ed, ev);
 	}
 	

@@ -20,7 +20,7 @@ public class Player extends Sprite{
 	private int spawnX, spawnY;
 	
 	private static final double GRAVITY = 0.5;
-	private double jumpStart, stopJumpSpeed;
+	private double jumpStart;
 	
 	private boolean moving;
 	
@@ -57,7 +57,6 @@ public class Player extends Sprite{
 		
 		terminalVelocity = air ? 20 : 10;
 		jumpStart = -terminalVelocity;
-		stopJumpSpeed = .3;
 		
 		right = true;
 		
@@ -67,7 +66,7 @@ public class Player extends Sprite{
 		swordamatino = new Animation();
 		
 		try{
-			BufferedImage temp = ImageIO.read(new File("Resources/Sprites/Player/player" + (fire ? "-fire" : "") + ".png"));
+			BufferedImage temp = ImageIO.read(new File("./Resources/Sprites/Player/player" + (fire ? "-fire" : "") + ".png"));
 			for (int j = 0; j < numFrames.length; j++){	
 				spriteSheet[j * 2] = new BufferedImage[numFrames[j]];
 				spriteSheet[j * 2 + 1] = new BufferedImage[numFrames[j]];
@@ -99,13 +98,13 @@ public class Player extends Sprite{
 		currentState = IDLE;
 		moving = false;
 		animatino = new Animation();
-		animatino.setFrames(spriteSheet[IDLE], 10);
 		
 	}
 
 	@Override
 	public void init() {
 		spawn();
+		
 	}
 	
 	private void getNextPosition(){
@@ -118,7 +117,7 @@ public class Player extends Sprite{
 		
 		if (isAirborne()) {
 			dy += GRAVITY;
-		}
+		} 
 
 		y += dy;
 		x += dx;
@@ -145,17 +144,15 @@ public class Player extends Sprite{
 			if (currentState != DYING){
 				currentState = DYING;
 				if (right){
-					animatino.setFrames(spriteSheet[DYING * 2], 10);
-					swordamatino.setFrames(swordSheet[(DYING - 3) * 2], 10);
+					animatino.setFrames(spriteSheet[DYING * 2], 10, true);
+					swordamatino.setFrames(swordSheet[(DYING - 3) * 2], 10, true);
 				} else {
-					animatino.setFrames(spriteSheet[DYING * 2 + 1], 10);
-					swordamatino.setFrames(swordSheet[(DYING - 3) * 2 + 1], 10);
+					animatino.setFrames(spriteSheet[DYING * 2 + 1], 10, true);
+					swordamatino.setFrames(swordSheet[(DYING - 3) * 2 + 1], 10, true);
 				}
 			} else {
 				animatino.update();
 				swordamatino.update();
-				if (animatino.hasPlayedOnce()) animatino.setFrame(numFrames[DYING] - 1);
-				if (swordamatino.hasPlayedOnce()) swordamatino.setFrame(swordFrames[(DYING - 3)] - 1);
 			}
 		} else {
 			getNextPosition();
@@ -163,11 +160,36 @@ public class Player extends Sprite{
 				if (animatino.hasPlayedOnce() == true){
 					swordamatino.setFrame(swordFrames[currentState - 3] - 1);
 					swordamatino.stop();
-					currentState = IDLE;
-					if (right){
-						animatino.setFrames(spriteSheet[IDLE * 2], 10);
+					if (isAirborne()){
+						currentState = JUMPING;
+						if (dx == 0){
+							if (right){
+								animatino.setFrames(spriteSheet[JUMPING * 2], 10, true);
+							} else {
+								animatino.setFrames(spriteSheet[JUMPING * 2 + 1], 10, true);
+							}
+						} else if (dx > 0){
+							right = true;
+							animatino.setFrames(spriteSheet[JUMPING * 2], 10, true);
+						} else {
+							right = false;
+							animatino.setFrames(spriteSheet[JUMPING * 2 + 1], 10, true);
+						}
 					} else {
-						animatino.setFrames(spriteSheet[IDLE * 2 + 1], 10);
+						currentState = IDLE;
+						if (dx == 0){
+							if (right){
+								animatino.setFrames(spriteSheet[JUMPING * 2], 10, true);
+							} else {
+								animatino.setFrames(spriteSheet[JUMPING * 2 + 1], 10, true);
+							}
+						} else if (dx > 0){
+							right = true;
+							animatino.setFrames(spriteSheet[IDLE * 2], 10, false);
+						} else {
+							right = false;
+							animatino.setFrames(spriteSheet[IDLE * 2 + 1], 10, false);
+						}
 					}
 				} else {
 					animatino.update();
@@ -216,54 +238,53 @@ public class Player extends Sprite{
 				}
 			}
 		}
-		g.setColor(Color.BLACK);
-		g.setFont(new Font("Times New Roman", Font.BOLD, 10));
-		g.drawString("Health", 5, 10);
-		g.setColor(Color.RED);
-		g.drawRect(15, 10, maxHealth * 10, 10);
-		g.fillRect(15, 10, health * 10, 10);
+		
 	}
 	
 	private void turnLeft(){
-		right = false;
-		dx = -3;
+		dx = -2;
 		if(!moving){
 			moving = true;
 		}
-		if (currentState != JUMPING && currentState != WALKING){
-			currentState = WALKING;
-			animatino.setFrames(spriteSheet[WALKING * 2 + 1], 3);
-		} else if (currentState == JUMPING){
-			animatino.setFrames(spriteSheet[JUMPING * 2 + 1], 10);
-
+		if (currentState != JUMPATTACK){ 
+			right = false;
+			if (currentState == JUMPING){
+				animatino.setFrames(spriteSheet[JUMPING * 2 + 1], 10, true);
+			} else if (currentState != WALKING){
+				currentState = WALKING;
+				animatino.setFrames(spriteSheet[WALKING * 2 + 1], 2, false);
+			}
 		}
+		
 
 	}
 	
 	private void turnRight(){
-		right = true;
-		dx = 3;
+		dx = 2;
 		if(!moving){
 			moving = true;
 		}
-		if (currentState != JUMPING && currentState != WALKING){
-			currentState = WALKING;
-			animatino.setFrames(spriteSheet[WALKING * 2], 3);
-		} else if (currentState == JUMPING){
-			animatino.setFrames(spriteSheet[JUMPING * 2], 10);
+		if (currentState != JUMPATTACK){ 
+			right = true;
+			if (currentState == JUMPING){
+				animatino.setFrames(spriteSheet[JUMPING * 2], 10, true);
+			} else if (currentState != WALKING){
+				currentState = WALKING;
+				animatino.setFrames(spriteSheet[WALKING * 2], 2, false);
+			}
 		}
+		
 	}
 	
 	private void jump(){
 		if (!isAttacking()){
 			if (currentState != JUMPING){
-				dy = jumpStart;
 				currentState = JUMPING;
 			}
 			if (right){
-				animatino.setFrames(spriteSheet[JUMPING * 2], 10);
+				animatino.setFrames(spriteSheet[JUMPING * 2], 10, true);
 			} else {
-				animatino.setFrames(spriteSheet[JUMPING * 2 + 1], 10);
+				animatino.setFrames(spriteSheet[JUMPING * 2 + 1], 10, true);
 			}
 		}
 	}
@@ -275,16 +296,16 @@ public class Player extends Sprite{
 		if (moving && currentState != WALKING){
 			currentState = WALKING;
 			if (right){
-				animatino.setFrames(spriteSheet[WALKING * 2], 3);
+				animatino.setFrames(spriteSheet[WALKING * 2], 2, false);
 			} else {
-				animatino.setFrames(spriteSheet[WALKING * 2 + 1], 3);
+				animatino.setFrames(spriteSheet[WALKING * 2 + 1], 2, false);
 			}
 		} else if (!moving && currentState != IDLE && currentState != ATTACKING){
 			currentState = IDLE;
 			if (right){
-				animatino.setFrames(spriteSheet[IDLE * 2], 10);
+				animatino.setFrames(spriteSheet[IDLE * 2], 10, false);
 			} else {
-				animatino.setFrames(spriteSheet[IDLE * 2 + 1], 10);
+				animatino.setFrames(spriteSheet[IDLE * 2 + 1], 10, false);
 			}
 		}
 	}
@@ -300,12 +321,17 @@ public class Player extends Sprite{
 		y = spawnY;
 		currentState = IDLE;
 		health = maxHealth;
+		right = true;
+		animatino.setFrames(spriteSheet[IDLE * 2], 10, false);
+		framesLeftInvincible= 0;
+		dx = 0;
+		System.out.println("Done");
 	}
 	
 	@Override
 	public void takeDamage(int damage){
     	if (/*currentState != BLOCKING &&*/ framesLeftInvincible == 0){
-    		playSound(new File("./Resources/Sound/Player/grunt.wav"));
+    		playSound("Player/grunt");
     		framesLeftInvincible = framesInvincible;
     		super.takeDamage(damage);
     	}
@@ -314,21 +340,24 @@ public class Player extends Sprite{
 	@Override
 	public boolean isDead(){
 		
-		return super.isDead() && animatino.hasPlayedOnce();
+		return super.isDead() && 
+				currentState == DYING &&
+				animatino.hasPlayedOnce();
 		
 	}
 	
 	@Override
 	public void die(){
 		//stuff stuff game over blah blah animation death
+		framesLeftInvincible = 0;
 		if (currentState != DYING){
 			currentState = DYING;
 			if (right){
-				animatino.setFrames(spriteSheet[DYING * 2], 10);
-				swordamatino.setFrames(swordSheet[(DYING - 3) * 2], 10);
+				animatino.setFrames(spriteSheet[DYING * 2], 10, true);
+				swordamatino.setFrames(swordSheet[(DYING - 3) * 2], 10, true);
 			} else {
-				animatino.setFrames(spriteSheet[DYING * 2 + 1], 10);
-				swordamatino.setFrames(swordSheet[(DYING - 3) * 2 + 1], 10);
+				animatino.setFrames(spriteSheet[DYING * 2 + 1], 10, true);
+				swordamatino.setFrames(swordSheet[(DYING - 3) * 2 + 1], 10, true);
 			}
 		}
 	}
@@ -349,7 +378,10 @@ public class Player extends Sprite{
 		if (!super.isDead()){
 			switch(k){
 			case KeyEvent.VK_UP : 
-				jump();
+				if (currentState != JUMPING){
+					dy = jumpStart;
+					jump();
+				}
 				break;
 			case KeyEvent.VK_DOWN : 
 				if (currentState != JUMPING){
@@ -370,20 +402,20 @@ public class Player extends Sprite{
 				if (isAirborne()){
 					currentState = JUMPATTACK;
 					if (right){
-						animatino.setFrames(spriteSheet[JUMPATTACK * 2], 3);
-						swordamatino.setFrames(swordSheet[(JUMPATTACK - 3) * 2], 3);
+						animatino.setFrames(spriteSheet[JUMPATTACK * 2], 2, true);
+						swordamatino.setFrames(swordSheet[(JUMPATTACK - 3) * 2], 2, true);
 					} else {
-						animatino.setFrames(spriteSheet[JUMPATTACK * 2 + 1], 3);
-						swordamatino.setFrames(swordSheet[(JUMPATTACK - 3) * 2 + 1], 3);
+						animatino.setFrames(spriteSheet[JUMPATTACK * 2 + 1], 2, true);
+						swordamatino.setFrames(swordSheet[(JUMPATTACK - 3) * 2 + 1], 2, true);
 					}
 				} else {
 					currentState = ATTACKING;
 					if (right){
-						animatino.setFrames(spriteSheet[ATTACKING * 2], 3);
-						swordamatino.setFrames(swordSheet[(ATTACKING - 3) * 2], 3);
+						animatino.setFrames(spriteSheet[ATTACKING * 2], 2, false);
+						swordamatino.setFrames(swordSheet[(ATTACKING - 3) * 2], 2, false);
 					} else {
-						animatino.setFrames(spriteSheet[ATTACKING * 2 + 1], 3);
-						swordamatino.setFrames(swordSheet[(ATTACKING - 3) * 2 + 1], 3);
+						animatino.setFrames(spriteSheet[ATTACKING * 2 + 1], 2, false);
+						swordamatino.setFrames(swordSheet[(ATTACKING - 3) * 2 + 1], 2, false);
 					}
 				}
 				break;
@@ -398,21 +430,23 @@ public class Player extends Sprite{
 				dy /= 3;
 				break;
 			case KeyEvent.VK_DOWN : 
-				if (currentState != JUMPING) /*or other ariel states*/currentState = IDLE;
-				if (right){
-					animatino.setFrames(spriteSheet[IDLE * 2], 10);
-				} else {
-					animatino.setFrames(spriteSheet[IDLE * 2 + 1], 10);
+				if (currentState != JUMPING){
+					if (right){
+						animatino.setFrames(spriteSheet[IDLE * 2], 10, true);
+					} else {
+						animatino.setFrames(spriteSheet[IDLE * 2 + 1], 10, true);
+					}/*or other ariel states*/
+					currentState = IDLE;
 				}
 				break;
 			case KeyEvent.VK_LEFT : 
 				moving = false;
-				if (currentState != JUMPING) {
+				if (currentState != JUMPING && currentState != JUMPATTACK) {
 					currentState = IDLE;
 					if (right){
-						animatino.setFrames(spriteSheet[IDLE * 2], 10);
+						animatino.setFrames(spriteSheet[IDLE * 2], 10, true);
 					} else {
-						animatino.setFrames(spriteSheet[IDLE * 2 + 1], 10);
+						animatino.setFrames(spriteSheet[IDLE * 2 + 1], 10, true);
 					}
 				}
 				
@@ -420,12 +454,12 @@ public class Player extends Sprite{
 				break;
 			case KeyEvent.VK_RIGHT : 
 				moving = false;
-				if (currentState != JUMPING){
+				if (currentState != JUMPING && currentState != JUMPATTACK){
 					currentState = IDLE;
 					if (right){
-						animatino.setFrames(spriteSheet[IDLE * 2], 10);
+						animatino.setFrames(spriteSheet[IDLE * 2], 10, false);
 					} else {
-						animatino.setFrames(spriteSheet[IDLE * 2 + 1], 10);
+						animatino.setFrames(spriteSheet[IDLE * 2 + 1], 10, false);
 					}
 				}
 				
@@ -450,7 +484,7 @@ public class Player extends Sprite{
 	public void collide(Rectangle rec, int code) {
 		switch(code){
 		case -1 : 
-			if (currentState != JUMPATTACK) currentState = JUMPING; 
+			if (currentState != JUMPATTACK) jump(); 
 			break;
 		case Sprite.UP : 
 						y = rec.getY() - getHeight();

@@ -20,7 +20,8 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 	
 	private Thread thread;
 	private boolean running;
-	private int FPS = 60;
+	public static int frames;
+	public static long timeElapsed;
 	
 	private BufferedImage image;
 	private Graphics2D g;
@@ -44,15 +45,29 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 	public void run(){
 		try{
 			while(running){
+				long start = System.currentTimeMillis();
 				gsm.update();
 				gsm.draw(g);
 				drawToScreen();
-				Thread.sleep(40);
+				
+				
+				long delay = 33 - (System.currentTimeMillis() - start);
+				if (delay < 0) delay = 0;
+				Thread.sleep(delay);
+				
+				long finish = System.currentTimeMillis();
+				
+				frames++;
+				timeElapsed += finish - start;
 			}
 		} catch (Exception e){
 			System.out.println("AW SHIT SON");
 			e.printStackTrace();
 		}
+	}
+	
+	public static double getFPS(){
+		return 1.0 * frames / timeElapsed * 1000;
 	}
 	
 	private void drawToScreen() {

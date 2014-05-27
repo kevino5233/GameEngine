@@ -64,9 +64,29 @@ public class FireState extends GameState{
 		try{
 
 			coords = new ArrayList<>();
-			pot = ImageIO.read(new File("./Resources/Sprites/Objects/pot.png"));
-			BufferedImage bg = ImageIO.read(new File("./Resources/Backgrounds/fire.png"));
-			lvmk = LevelMakerData.parse(new File("./Resources/Levels/fire.lvmk"));
+			pot = ImageIO.read(
+					this.getClass().getResourceAsStream("/Resources/Sprites/Objects/pot.png")
+					);
+			BufferedImage bg = ImageIO.read(
+					this.getClass().getResourceAsStream("/Resources/Backgrounds/fire.png")
+					);
+			
+			amulet = ImageIO.read(
+					this.getClass().getResourceAsStream("/Resources/Sprites/Objects/Amulet/amulet.png")
+				);
+			firePendant = ImageIO.read(
+					this.getClass().getResourceAsStream("/Resources/Sprites/Objects/Amulet/fire.png")
+			);
+			airPendant = ImageIO.read(
+					this.getClass().getResourceAsStream("/Resources/Sprites/Objects/Amulet/air.png")
+			);
+			earthPendant = ImageIO.read(
+					this.getClass().getResourceAsStream("/Resources/Sprites/Objects/Amulet/earth.png")
+			);
+			waterPendant = ImageIO.read(
+					this.getClass().getResourceAsStream("/Resources/Sprites/Objects/Amulet/water.png")
+			);
+			lvmk = LevelMakerData.parse("fire");
 			tileMap = new TileMap(bg, lvmk.getTileMap(), lvmk.getTileTypes(), lvmk.getEnemyData());
 			player = new Player(tileMap, gsm.getFire(), gsm.getAir(), gsm.getDifficulty());
 			textEventListener = new TextEventListener();
@@ -97,7 +117,7 @@ public class FireState extends GameState{
 		for (String s : textEvents){
 			textEventListener.add(s);
 		}
-		playSound(new File("./Resources/Sound/Music/fire.wav"));
+		playSound("fire");
 		paused = false;
 		
 		System.out.println("Done");
@@ -110,7 +130,8 @@ public class FireState extends GameState{
 				
 				if (fireGodThanks.isDone()){
 					stopSound();
-					gsm.setState(GameStateManager.MENUSTATE);
+					gsm.complete(GameStateManager.FIRESTATE);
+					gsm.setState(GameStateManager.HUBSTATE);
 					
 				} else {
 					textEventListener.playMessage(
@@ -182,12 +203,17 @@ public class FireState extends GameState{
 					}
 					g.setColor(Color.BLACK);
 					g.setFont(new Font("Times New Roman", Font.BOLD, 10));
-					g.drawString("Health", 5, 10);
+					g.drawString("Health", 60, 10);
 					g.setColor(Color.RED);
-					g.drawRect(15, 10, player.getMaxHealth() * 10, 10);
-					g.fillRect(15, 10, player.getHealth() * 10, 10);
-					
+					g.drawRect(75, 15, player.getMaxHealth() * 10, 10);
+					g.fillRect(75, 15, player.getHealth() * 10, 10);
 
+					g.drawImage(amulet, 0, 0, null);
+					if (gsm.getFire()) g.drawImage(firePendant, 0, 0, null);
+					if (gsm.getAir()) g.drawImage(airPendant, 0, 0, null);
+					if (gsm.getWater()) g.drawImage(waterPendant, 0, 0, null);
+					if (gsm.getEarth()) g.drawImage(earthPendant, 0, 0, null);
+					
 					if (player.isDead()){
 						g.setFont(new Font("Times New Roman", Font.BOLD, 30));
 						g.setColor(Color.RED);

@@ -67,7 +67,7 @@ public class Goat extends Enemy{
 		spriteSheet = new BufferedImage[4][];
 
 		try{
-			BufferedImage temp = ImageIO.read(new File("Resources/Sprites/Enemies/goat.png"));
+			BufferedImage temp = ImageIO.read(new File("./Resources/Sprites/Enemies/goat.png"));
 			for (int j = 0; j < spriteSheet.length / 2; j++){	
 				spriteSheet[j * 2] = new BufferedImage[numFrames[j]];
 				spriteSheet[j * 2 + 1] = new BufferedImage[numFrames[j]];
@@ -88,7 +88,7 @@ public class Goat extends Enemy{
 		animatino = new Animation();
 		
 		currentState = WALKING;
-		animatino.setFrames(spriteSheet[WALKING * 2 + 1], 3);
+		animatino.setFrames(spriteSheet[WALKING * 2 + 1], 3, false);
 	}
 
 	@Override
@@ -98,7 +98,7 @@ public class Goat extends Enemy{
 			sp.isAttacking() && 
 			sp.getHitbox().intersects(new Rectangle(getX(), getY(), width, height))
 		   ){
-			playSound(new File("./Resources/Sound/Player/sword_impact.wav"));
+			playSound("Player/sword_impact");
 			framesLeftInvincible = framesInvincible;
 			takeDamage(3);
 		}
@@ -114,12 +114,12 @@ public class Goat extends Enemy{
 			x = x2;
 			dx = -1;
 			right = false;
-			animatino.setFrames(spriteSheet[WALKING * 2], 3);
+			animatino.setFrames(spriteSheet[WALKING * 2], 3, false);
 		} else if (dx < 0 && x <= x1){
 			x = x1;
 			dx = 1;
 			right = true;
-			animatino.setFrames(spriteSheet[WALKING * 2 + 1], 3);
+			animatino.setFrames(spriteSheet[WALKING * 2 + 1], 3, false);
 		}
 		
 		x += dx;
@@ -135,10 +135,10 @@ public class Goat extends Enemy{
 		currentState = WALKING;
 		if (right){
 			dx = 1;
-			animatino.setFrames(spriteSheet[WALKING * 2 + 1], 3);
+			animatino.setFrames(spriteSheet[WALKING * 2 + 1], 3, false);
 		} else {
 			dx = -1;
-			animatino.setFrames(spriteSheet[WALKING * 2], 3);
+			animatino.setFrames(spriteSheet[WALKING * 2], 3, false);
 		}
 	}
 
@@ -160,9 +160,9 @@ public class Goat extends Enemy{
 				currentState = IDLE;
 				dx = 0;
 				if (right){
-					animatino.setFrames(spriteSheet[IDLE * 2 + 1], 10);
+					animatino.setFrames(spriteSheet[IDLE * 2 + 1], 10, true);
 				} else {
-					animatino.setFrames(spriteSheet[IDLE * 2], 10);
+					animatino.setFrames(spriteSheet[IDLE * 2], 10, true);
 				}
 			} else if (numFramesFrozen++ >= numFramesFreeze){
 				resetFreezeFrames();

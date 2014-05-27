@@ -59,6 +59,12 @@ public class TextEventListener {
 	}
 	
 	public boolean isPlaying(){ return isEventPlaying; }
+	public boolean isDone(){
+		if (isEventPlaying && eventPlaying != null){
+			return eventPlaying.isDone();
+		}
+		return false;
+	}
 	
 	public void update(){
 		if (isEventPlaying){

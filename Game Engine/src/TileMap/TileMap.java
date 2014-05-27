@@ -62,14 +62,17 @@ public class TileMap {
 				int type = tileData[j][i];
 				tiles[j][i] = new Tile(tileMap.getSubimage(type % numTilesAcross * tileSize, 
 														   type / numTilesAcross * tileSize, 
-														   tileSize, 
+													   tileSize, 
 														   tileSize), 
 														   type / w);
-			}
+			}	
 		}
 		
 		height = rows * tileSize;
 		width = cols * tileSize;
+		
+		numColsToDraw = GamePanel.WIDTH / tileSize + 1;
+		numRowsToDraw = GamePanel.HEIGHT / tileSize + 1;
 		
 		enemyData = new Enemy[ed.length][ed[0].length];
 		for (int j = 0; j < ed.length; j++){
@@ -90,16 +93,44 @@ public class TileMap {
 				case "Spike" :
 					enemyData[j][i] = new Spike(this, i * tileSize, j * tileSize);
 					break;
+				case "Fist" :
+					enemyData[j][i] = new Fist(this, i * tileSize, j * tileSize);
+					break;
 				}
 			}
+			
+			liveEnemies = new ArrayList<>();
 		}
 		
-		liveEnemies = new ArrayList<>();
 
 		background = bg;
 		
 		frame = new BufferedImage(GamePanel.WIDTH * GamePanel.SCALE, GamePanel.HEIGHT * GamePanel.SCALE, BufferedImage.TYPE_INT_RGB);
 		
+	}
+	
+	public void init(){
+		center(spawnX * tileSize, spawnY * tileSize);
+		
+		liveEnemies.clear();
+		
+		int colOffset = (int)camX / tileSize;
+		int rowOffset = (int)camY / tileSize;
+		
+		for (int j = 0; j < numRowsToDraw; j++){
+			int row = rowOffset + j;
+			if (row >= rows) break;
+			for (int i = 0; i < numColsToDraw; i++){
+				int col = colOffset + i;
+				if (col >= cols) break;
+				if (enemyData[row][col] != null){
+					Enemy e = enemyData[row][col];
+					e.spawn();
+					liveEnemies.add(e);
+					
+				}
+			}
+		}
 	}
 	
 	public int getTileSize(){ return tileSize; }
@@ -228,7 +259,7 @@ public class TileMap {
             }
         }
 		
-		for (int y = sp.getY() + tileSize; y < sp.getY() + sp.getHeight(); y += tileSize){
+		for (int y = sp.getY(); y < sp.getY() + sp.getHeight(); y += tileSize){
 			int y2 = y / tileSize;
 //			System.out.println(getTile(x1, y2).getType());
 //			System.out.println(getTile(x2, y2).getType());
@@ -255,61 +286,10 @@ public class TileMap {
 	            	return;
 	            }        	
 	        }
-		}
-		
-//		if (getTile(x1, y1).getType() == Tile.BLOCKING){
-//        	int code = Sprite.isTouchingHorizontally(
-//        			new Rectangle(x1 * tileSize, y1*tileSize, tileSize, tileSize),
-//        			new Rectangle(sp.getX(), sp.getY(), sp.getWidth(), sp.getHeight())
-//        			);
-//        	if (code != -1) {
-//        		sp.collide(new Rectangle(x1 * tileSize, y1*tileSize, tileSize, tileSize), code);
-//        		return;
-//        	}
-//        }
-//		
-//		if (x2 < getCols() && getTile(x2, y1).getType() == Tile.BLOCKING){
-//        	int code = Sprite.isTouchingHorizontally(
-//        			new Rectangle(x2 * tileSize, y1 * tileSize, tileSize, tileSize),
-//        			new Rectangle(sp.getX(), sp.getY(), sp.getWidth(), sp.getHeight())
-//        			);
-//        	if (code != -1) {
-//            	sp.collide(new Rectangle(x2 * tileSize, y1*tileSize, tileSize, tileSize), code);
-//            	return;
-//            }
-//        }
-//        
-//        if (y2 < getRows() && getTile(x1, y2).getType() == Tile.BLOCKING){
-//        	int code = Sprite.isTouchingHorizontally(
-//        			new Rectangle(x1 * tileSize, y2 * tileSize, tileSize, tileSize),
-//        			new Rectangle(sp.getX(), sp.getY(), sp.getWidth(), sp.getHeight())
-//        			);
-//        	if (code != -1) {
-//            	sp.collide(new Rectangle(x1 * tileSize, y2 * tileSize, tileSize, tileSize), code);
-//            	return;
-//            }
-//        }
-//
-//        if (x2 < getCols() && y2 < getRows() && getTile(x2, y2).getType() == Tile.BLOCKING){
-//        	int code = Sprite.isTouchingHorizontally(
-//        			new Rectangle(x2 * tileSize, y2 * tileSize, tileSize, tileSize),
-//        			new Rectangle(sp.getX(),sp.getY(), sp.getWidth(), sp.getHeight())
-//        			);
-//        	if (code != -1) {
-//            	sp.collide(new Rectangle(x2 * tileSize, y2 * tileSize, tileSize, tileSize), code);
-//            	return;
-//            }        	
-//        }
-        
+		}        
 	}
 	
 	public void update(Player player){
-		
-//		textEventListener.playMessage(player.getX(), player.getY());
-//		
-//		if (textEventListener.isPlaying()){
-//			return;
-//		}
 		
 		center(player.getX(), player.getY());
 		
@@ -337,22 +317,62 @@ public class TileMap {
 							  null
 							 );
 		
+		for (int x = colOffset - 1; x <= colOffset + numColsToDraw; x++){
+			if (x < 0 || x >= cols) continue;
+			if (rowOffset - 1 >= 0){
+				if (enemyData[rowOffset - 1][x] != null){
+					Enemy e = enemyData[rowOffset - 1][x];
+					if (!e.isActive()){
+						e.spawn();
+						liveEnemies.add(e);
+					}
+				}
+			}
+
+			if (rowOffset + numRowsToDraw < rows){
+				if (enemyData[rowOffset + numRowsToDraw][x] != null){
+					Enemy e = enemyData[rowOffset + numRowsToDraw][x];
+					if (!e.isActive()){
+						e.spawn();
+						liveEnemies.add(e);
+					}
+				}
+			}
+			
+		}
+		
+		for (int y = rowOffset; y < rowOffset + numRowsToDraw; y++){
+			if (y >= rows){
+				break;
+			}
+			
+			if (colOffset - 1 >=  0){
+				if (enemyData[y][colOffset - 1] != null){
+					Enemy e = enemyData[y][colOffset - 1];
+					if (!e.isActive()){
+						e.spawn();
+						liveEnemies.add(e);
+					}
+				}
+			}
+			
+			if (colOffset + numColsToDraw < cols){
+				if (enemyData[y][colOffset + numColsToDraw] != null){
+					Enemy e = enemyData[y][colOffset + numColsToDraw];
+					if (!e.isActive()){
+						e.spawn();
+						liveEnemies.add(e);
+					}
+				}
+			}
+		}
+		
 		for (int j = 0; j < numRowsToDraw; j++){
 			int row = rowOffset + j;
 			if (row >= rows) break;
 			for (int i = 0; i < numColsToDraw; i++){
 				int col = colOffset + i;
 				if (col >= cols) break;
-				
-				if (enemyData[row][col] != null){
-					Enemy e = enemyData[row][col];
-					if (!e.isActive()){
-						//add in bounds thing
-						e.spawn();
-						liveEnemies.add(e);
-					}
-				}
-				
 				if (tileData[row][col] == 0) continue;
 				
 				camGraphics.drawImage(tiles[row][col].getImage().getScaledInstance(tileSize * GamePanel.SCALE, tileSize * GamePanel.SCALE, 0),

@@ -30,7 +30,7 @@ public class PauseState implements ActionListener{
 	
 	private Color textColor, selectedColor;
 	
-	private Font textFont;
+	private Font textFont, infoFont;
 	
 	private boolean displayControls;
 	
@@ -42,15 +42,17 @@ public class PauseState implements ActionListener{
 		
 		this.gsm = gsm;
 		
-		textColor = Color.BLACK;
+		textColor = Color.RED;
 		selectedColor = Color.WHITE;
 		
 		timer = new Timer(500, this);
 		
 		textFont = new Font("Times New Roman", Font.PLAIN, 30);
+		infoFont = new Font("Times New Roman", Font.PLAIN, 10);
 		
 		try{
 			background = ImageIO.read(new File("./Resources/Sprites/Objects/menu.png"));
+			
 		} catch (IOException e){
 			System.out.println("Couldn't find file");
 		}
@@ -87,20 +89,27 @@ public class PauseState implements ActionListener{
 		// TODO Auto-generated method stub
 		g.setFont(textFont);
 		g.drawImage(background, x * GamePanel.SCALE, y * GamePanel.SCALE, null);
+		if (options[0].equals("Yes")){
+			g.setColor(textColor);
+			g.drawString("Really quit?", this.x * GamePanel.SCALE + 100, this.y * GamePanel.SCALE + 75);
+			g.setFont(infoFont);
+			g.drawString("Progress in this level will NOT be saved", this.x * GamePanel.SCALE + 100, this.y * GamePanel.SCALE + 175);
+		}
 		for (int x = 0; x < options.length; x++){
+			g.setFont(textFont);
 			if (x == pos){
-				g.setColor(Color.WHITE);
+				g.setColor(selectedColor);
 			} else {
-				g.setColor(Color.RED);
+				g.setColor(textColor);
 			}
 			g.drawString(options[x], 
-						 this.x * GamePanel.SCALE + 125, 
-						 this.y * GamePanel.SCALE + 75 + 50 * x
+						 this.x * GamePanel.SCALE + 100, 
+						 this.y * GamePanel.SCALE + 100 + 40 * x
 						 );
 		}
 		if (displayControls){
 			int drawX = 250;
-			int drawY = 175;
+			int drawY = 200;
 			int yDiff = 20;
 					
 			g.setFont(new Font("Times New Roman", Font.PLAIN, 15));
@@ -123,7 +132,7 @@ public class PauseState implements ActionListener{
 		} else if (k == KeyEvent.VK_DOWN){
 			dpos = 1;
 			timer.start();
-		} else if (k == KeyEvent.VK_ENTER){
+		} else if (k == KeyEvent.VK_SPACE || k == KeyEvent.VK_ENTER){
 			switch(options[pos]){
 			case "Resume" : 
 				gs.unpause(); 
@@ -134,10 +143,24 @@ public class PauseState implements ActionListener{
 				displayControls = true;
 				pos = 0;
 				break; //open the thing
-			case "Quit" : 
+			case "Yes" :
 				GameState.stopSound();
 				gsm.setState(GameStateManager.MENUSTATE);
 				break;
+			case "No" :
+			case "Back" :
+				options = new String[3];
+				options[0] = "Resume";
+				options[1] = "Help";
+				options[2] = "Quit";
+				displayControls = false;
+				pos = 0;
+				break;
+			case "Quit" : 
+				options = new String[2];
+				options[0] = "Yes";
+				options[1] = "No";
+				pos = 0;
 			}
 		} else if (k == KeyEvent.VK_ESCAPE){
 			gs.unpause();

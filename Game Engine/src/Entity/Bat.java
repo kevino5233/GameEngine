@@ -8,6 +8,7 @@ import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
 
+import GameState.MenuState;
 import Main.GamePanel;
 import TileMap.TileMap;
 
@@ -46,7 +47,9 @@ public class Bat extends Enemy{
 		spriteSheet = new BufferedImage[2][];
 		
 		try{
-			BufferedImage temp = ImageIO.read(new File("Resources/Sprites/Enemies/bat.png"));
+			BufferedImage temp = ImageIO.read(
+					this.getClass().getResourceAsStream("/Resources/Sprites/Enemies/bat.png")
+					);
 			for (int j = 0; j < spriteSheet.length; j++){
 				spriteSheet[j] = new BufferedImage[numFrames[j]];
 				for (int i = 0; i < numFrames[j]; i++){
@@ -67,14 +70,14 @@ public class Bat extends Enemy{
 		
 		currentState = FLYING;
 		animatino = new Animation();
-		animatino.setFrames(spriteSheet[FLYING], 2);
+		animatino.setFrames(spriteSheet[FLYING], 4, false);
 		
 	}
 	
 	public void getNextPosition(Player sp){
 		
 		if (sp.isAttacking() && sp.getHitbox().contains(x, y)){
-			playSound(new File("./Resources/Sound/Player/sword_impact.wav"));
+			playSound("Player/sword_impact");
 			takeDamage(3);
 		}
 		

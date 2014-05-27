@@ -36,8 +36,6 @@ class AudioListener implements LineListener{
 		}
 	}
 	
-	
-	
 }
 
 public abstract class Sprite{
@@ -193,13 +191,13 @@ public abstract class Sprite{
        
     }
     
-    public static synchronized void playSound(final File file) {
+    public static synchronized void playSound(final String string) {
 		  new Thread(new Runnable() {
 		  // The wrapper thread is unnecessary, unless it blocks on the
 		  // Clip finishing; see comments.
 		    public void run() {
 		      try {
-		    	  InputStream audioSrc = new FileInputStream(file);
+		    	  InputStream audioSrc = getClass().getResourceAsStream("/Resources/Sound/" + string + ".wav");
 		    	  BufferedInputStream inputStream = new BufferedInputStream(audioSrc);
 		    	  AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(inputStream);
 

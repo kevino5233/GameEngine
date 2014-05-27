@@ -42,11 +42,12 @@ public class EnemyPalettePanel extends JPanel implements ActionListener{
 		enemyButtons[0][3] = new JButton("FireElemental");
 		enemyButtons[0][4] = new JButton("Spike");
 		
-		enemyButtons[1] = new JButton[4];
+		enemyButtons[1] = new JButton[5];
 		enemyButtons[1][0] = new JButton("Bat");
 		enemyButtons[1][1] = new JButton("Goat");
 		enemyButtons[1][2] = new JButton("Cyclops");
 		enemyButtons[1][3] = new JButton("Spike");
+		enemyButtons[1][4] = new JButton("Fist");
 		
 		for (JButton[] list : enemyButtons){
 			for (JButton b : list){
@@ -84,7 +85,10 @@ public class EnemyPalettePanel extends JPanel implements ActionListener{
 					.addComponent(enemyButtons[0][3])
 					.addComponent(enemyButtons[1][3])
 				)
-				.addComponent(enemyButtons[0][4])
+				.addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+					.addComponent(enemyButtons[0][4])
+					.addComponent(enemyButtons[1][4])
+				)
 		);
 		
 		layout.setVerticalGroup(
@@ -107,6 +111,7 @@ public class EnemyPalettePanel extends JPanel implements ActionListener{
 					.addComponent(enemyButtons[1][1])
 					.addComponent(enemyButtons[1][2])
 					.addComponent(enemyButtons[1][3])
+					.addComponent(enemyButtons[1][4])
 				)
 		);
 		

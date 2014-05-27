@@ -139,8 +139,7 @@ public class MainPanel extends JPanel implements ActionListener{
 			if (return_val == JFileChooser.APPROVE_OPTION){
 				try{
 					
-					
-					map.load(LevelMakerData.parse(fileChooser.getSelectedFile()));
+					map.load(LevelMakerData.parse(fileChooser.getSelectedFile().getAbsolutePath()));
 					
 				} catch (IOException exception){
 					System.out.println("Error while loading file");

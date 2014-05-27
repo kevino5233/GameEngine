@@ -53,7 +53,17 @@ public class TextEvent {
 		g.setFont(new Font("Arial", Font.BOLD, 10));
 		g.drawString(speaker, 100, 40);
 		g.setFont(new Font("Arial", Font.PLAIN, 10));
-		g.drawString(display, 110, 50);
+		String d = display;
+		
+		int drawX = 110;
+		int drawY = 50;
+		
+		while(d.length() > 50){
+			g.drawString(d.substring(0, 50), drawX, drawY);
+			d = d.substring(50);
+			drawY += 10;
+		}
+		g.drawString(d, drawX, drawY);
 		if (done) {
 			g.drawString("Press space to continue", GamePanel.WIDTH * GamePanel.SCALE - 250, 95);
 		}
@@ -67,6 +77,7 @@ public class TextEvent {
 	
 	public void reset(){
 		display = "";
+		done = false;
 	}
 	
 	public String toString(){

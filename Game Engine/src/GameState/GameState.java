@@ -1,16 +1,15 @@
 package GameState;
 
+import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.InputStream;
 
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 import javax.sound.sampled.LineEvent;
-import javax.sound.sampled.LineListener;
 import javax.sound.sampled.LineEvent.Type;
+import javax.sound.sampled.LineListener;
 
 class AudioListener implements LineListener{
 
@@ -43,6 +42,8 @@ public abstract class GameState {
 	
 	protected PauseState pauseMenu;
 	
+	protected BufferedImage amulet, earthPendant, firePendant, waterPendant, airPendant;
+	
 	private static Thread sound;
 	private static Clip clip;
 	
@@ -61,13 +62,13 @@ public abstract class GameState {
 	public void pause(){ paused = true; }
 	public void unpause(){ paused = false; }
 	
-	public static synchronized void playSound(final File file) {
+	public static synchronized void playSound(final String string) {
 		  sound = new Thread(new Runnable() {
 		  // The wrapper thread is unnecessary, unless it blocks on the
 		  // Clip finishing; see comments.
 		    public void run() {
 		      try {
-		    	  InputStream audioSrc = new FileInputStream(file);
+		    	  InputStream audioSrc = getClass().getResourceAsStream("/Resources/Sound/Music/" + string + ".wav");
 		    	  BufferedInputStream inputStream = new BufferedInputStream(audioSrc);
 		    	  AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(inputStream);
 
@@ -86,6 +87,13 @@ public abstract class GameState {
 		    }
 		  });
 		  sound.start();
+	}
+	
+	public static synchronized boolean isPlaying(){
+		if (clip != null){
+			return clip.isActive();
+		}
+		return false;
 	}
 	
 	public static synchronized void stopSound(){
