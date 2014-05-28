@@ -80,7 +80,6 @@ public class LevelMakerData {
 		 */
 		
 		InputStream in = Main.class.getResourceAsStream("/Resources/Levels/" + levelName + ".lvmk");		
-		System.out.println(in == null);
 		BufferedReader level = 
 				new BufferedReader(
 					new InputStreamReader(in)
@@ -110,7 +109,6 @@ public class LevelMakerData {
 		String[][] ed = new String[tt.length][tt[0].length];
 		for (int j = 0; j < tt.length; j++){
 			dat = level.readLine().split(" ");
-			System.out.println(Arrays.toString(dat));
 			for (int i = 0; i < tt[0].length; i++){
 				ed[j][i] = dat[i];
 			}

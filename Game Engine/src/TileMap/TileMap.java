@@ -89,7 +89,7 @@ public class TileMap {
 				case "Bat" : 
 					enemyData[j][i] = new Bat(this, i * tileSize, j * tileSize); 
 					break;
-				case "Goat" :
+				 case "Goat" :
 					enemyData[j][i] = new Goat(this, i * tileSize, j * tileSize);
 					break;
 				case "Spike" :
@@ -98,11 +98,13 @@ public class TileMap {
 				case "Fist" :
 					enemyData[j][i] = new Fist(this, i * tileSize, j * tileSize);
 					break;
+				case "Eyeball" :
+					enemyData[j][i] = new Eyeball(this, i * tileSize, j * tileSize);
+					break;
 				}
 			}
-			
-			liveEnemies = new ArrayList<>();
 		}
+		liveEnemies = new ArrayList<>();
 
 		
 		//frame = new BufferedImage(GamePanel.WIDTH * GamePanel.SCALE, GamePanel.HEIGHT * GamePanel.SCALE, BufferedImage.TYPE_INT_RGB);
@@ -127,10 +129,10 @@ public class TileMap {
 					Enemy e = enemyData[row][col];
 					e.spawn();
 					liveEnemies.add(e);
-					
 				}
 			}
 		}
+		System.out.println(liveEnemies.size() + " enemies");
 	}
 	
 	public int getTileSize(){ return tileSize; }

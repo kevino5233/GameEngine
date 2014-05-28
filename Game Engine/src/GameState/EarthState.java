@@ -154,12 +154,12 @@ public class EarthState extends GameState{
 			tileMap.center(player.getX(), player.getY());
 			tileMap.update(player);
 			if (!goat1.isDead()){
-				goat1.update();
 				goat1.getNextPosition(player);
+				goat1.update();
 			}
 			if (!goat2.isDead()){
-				goat2.update();
 				goat2.getNextPosition(player);
+				goat2.update();
 			}
 		}
 		

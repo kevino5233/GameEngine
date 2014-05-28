@@ -20,10 +20,6 @@ public class Bat extends Enemy{
 	private int startX, startY,
 				endX, endY;
 	
-	private int maxHealth, health;
-	
-	private double activateDistance;
-	
 	private boolean attacking;
 	
 	private BufferedImage[][] spriteSheet;
@@ -65,8 +61,6 @@ public class Bat extends Enemy{
 			System.out.println("Error loading the bat");
 			e.printStackTrace();
 		}
-		
-		activateDistance = 70;
 		
 		currentState = FLYING;
 		animatino = new Animation();

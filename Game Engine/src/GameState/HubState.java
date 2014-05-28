@@ -96,6 +96,7 @@ public class HubState extends GameState{
 	@Override
 	public void init() {
 		player.spawn();
+		tileMap.init();
 		ArrayList<String> textEvents = lvmk.getEvents();
 		for (String s : textEvents){
 			textEventListener.add(s);

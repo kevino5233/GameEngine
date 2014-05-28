@@ -16,8 +16,6 @@ public class Fist extends Enemy{
 	private static final int ATTACKING = 1;
 	private static final int RETREATING = 2;
 	
-	private Animation animatino;
-	
 	private int framesRest, framesRested;
 	
 	private BufferedImage[][] spriteSheet;
