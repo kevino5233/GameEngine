@@ -27,6 +27,8 @@ public class HubState extends GameState{
 	
 	private TextEventListener textEventListener;
 	
+	private BufferedImage bg;
+	
 	private Rectangle earth, wind, fire, air;
 	
 	private LevelMakerData lvmk;
@@ -57,7 +59,7 @@ public class HubState extends GameState{
 		
 		try{
 			//tileMap = new TileMap("hub");
-			BufferedImage bg = ImageIO.read(
+			bg = ImageIO.read(
 						this.getClass().getResourceAsStream("/Resources/Backgrounds/hub.png")
 					);
 			
@@ -78,7 +80,7 @@ public class HubState extends GameState{
 			);
 			
 			lvmk = LevelMakerData.parse("hub");
-			tileMap = new TileMap(bg, lvmk.getTileMap(), lvmk.getTileTypes(), lvmk.getEnemyData());
+			tileMap = new TileMap(lvmk.getTileMap(), lvmk.getTileTypes(), lvmk.getEnemyData());
 			player = new Player(tileMap, gsm.getFire(), gsm.getAir(), gsm.getDifficulty());
 			textEventListener = new TextEventListener();
 			
@@ -118,6 +120,7 @@ public class HubState extends GameState{
 		}
 		if (tileMap != null && player != null && !paused && !textEventListener.isPlaying()){
 			if (!player.isDead()) player.update();
+			tileMap.center(player.getX(), player.getY());
 			tileMap.update(player);
 		}
 	}
@@ -138,8 +141,14 @@ public class HubState extends GameState{
 					if (textEventListener != null && textEventListener.isPlaying()){
 						textEventListener.draw(g);
 					} else {
-						tileMap.draw(g);
+						
+						g.drawImage(bg.getScaledInstance(GamePanel.WIDTH * GamePanel.SCALE, GamePanel.HEIGHT * GamePanel.SCALE, 0),
+								0, 
+								0,
+								null
+								);
 						player.draw(g);
+						tileMap.draw(g);
 					}
 					
 					g.setColor(Color.BLACK);

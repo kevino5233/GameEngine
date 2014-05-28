@@ -32,7 +32,7 @@ public class FireState extends GameState{
 	
 	private LevelMakerData lvmk;
 	
-	private BufferedImage pot;
+	private BufferedImage pot, bg, frame;
 	
 	private TextEvent fireGodThanks,
 					  dropItLikeItsHot, 
@@ -61,13 +61,21 @@ public class FireState extends GameState{
 				"You only need to weed out one more"
 				);
 		
+		int numColsToDraw = GamePanel.WIDTH / TileMap.tileSize;
+		int numRowsToDraw = GamePanel.HEIGHT / TileMap.tileSize;
+		
+		frame = new BufferedImage(((numColsToDraw + 1) * TileMap.tileSize) * GamePanel.SCALE,
+				((numRowsToDraw + 1) * TileMap.tileSize) * GamePanel.SCALE,
+				BufferedImage.TYPE_INT_RGB
+				);
+		
 		try{
 
 			coords = new ArrayList<>();
 			pot = ImageIO.read(
 					this.getClass().getResourceAsStream("/Resources/Sprites/Objects/pot.png")
 					);
-			BufferedImage bg = ImageIO.read(
+			bg = ImageIO.read(
 					this.getClass().getResourceAsStream("/Resources/Backgrounds/fire.png")
 					);
 			
@@ -87,7 +95,7 @@ public class FireState extends GameState{
 					this.getClass().getResourceAsStream("/Resources/Sprites/Objects/Amulet/water.png")
 			);
 			lvmk = LevelMakerData.parse("fire");
-			tileMap = new TileMap(bg, lvmk.getTileMap(), lvmk.getTileTypes(), lvmk.getEnemyData());
+			tileMap = new TileMap(lvmk.getTileMap(), lvmk.getTileTypes(), lvmk.getEnemyData());
 			player = new Player(tileMap, gsm.getFire(), gsm.getAir(), gsm.getDifficulty());
 			textEventListener = new TextEventListener();
 			
@@ -148,6 +156,7 @@ public class FireState extends GameState{
 		}
 		if (tileMap != null && player != null && !paused && !textEventListener.isPlaying()){
 			if (!player.isDead()) player.update();
+			tileMap.center(player.getX(), player.getY());
 			tileMap.update(player);
 		}
 		for (int i = 0; i < coords.size(); i++){
@@ -183,8 +192,23 @@ public class FireState extends GameState{
 				pauseMenu.draw(g);
 			} else {
 				if (tileMap != null && player != null){
-					tileMap.draw(g);
-					player.draw(g);
+					
+					Graphics2D frameGraphics = (Graphics2D)frame.getGraphics();
+					
+					frameGraphics.drawImage(bg.getScaledInstance(GamePanel.WIDTH * GamePanel.SCALE, GamePanel.HEIGHT * GamePanel.SCALE, 0),
+							tileMap.getDrawX(), 
+							tileMap.getDrawY(),
+							null
+							);
+					
+					player.draw(frameGraphics);
+					tileMap.draw(frameGraphics);
+					
+					g.drawImage(frame.getSubimage(tileMap.getDrawX(), tileMap.getDrawY(), GamePanel.WIDTH * GamePanel.SCALE, GamePanel.HEIGHT * GamePanel.SCALE),
+							0,
+							0,
+							null
+							);
 					
 					for (Rectangle rec : coords){
 						if (rec.getX() + rec.getWidth() > tileMap.getX() &&

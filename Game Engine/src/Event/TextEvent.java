@@ -19,13 +19,45 @@ public class TextEvent {
 				   display, 
 				   speaker;
 	
+	private int pos;
+	
 	private boolean done;
 	
 	public TextEvent(String s, String m){
 		message = m;
 		display = "";
 		speaker = s;
+		pos = 0;
 		done = false;
+		
+		String word = "";
+		String d = "";
+		int words = 0;
+		
+		for (char c : message.toCharArray()){
+			word += c;
+			
+			if (c == ' '){
+				words++;
+				if ((word + d).length() >= 50){
+					display += d + "|" + word;
+					words = 0;
+					d = "";
+				} else if (words >= 12){
+					display += d + word + "|";
+					words = 0;
+					d = "";
+				} else {
+					d += word;
+				}
+				word = "";
+			}
+		}
+		display += d + word;
+		
+		System.out.println(display);
+		System.out.println(message);
+		System.out.println();
 		
 		try{
 			box = ImageIO.read(new File("./Resources/Sprites/Objects/Textbox.png"));
@@ -41,8 +73,8 @@ public class TextEvent {
 	
 	public void update(){
 		if (!done){
-			display += message.charAt(display.length());
-			done = message.length() == display.length();
+			pos++;
+			done = pos == message.length();
 		}
 	}
 	
@@ -53,17 +85,27 @@ public class TextEvent {
 		g.setFont(new Font("Arial", Font.BOLD, 10));
 		g.drawString(speaker, 100, 40);
 		g.setFont(new Font("Arial", Font.PLAIN, 10));
-		String d = display;
 		
 		int drawX = 110;
 		int drawY = 50;
 		
-		while(d.length() > 50){
-			g.drawString(d.substring(0, 50), drawX, drawY);
-			d = d.substring(50);
+		String[] dat = display.split("[|]");
+		
+		String d = "";
+		int x = 0;
+		
+		for (String s : dat){
+			for (char c : s.toCharArray()){
+				x++;
+				d += c;
+				if (x == pos) break;
+			}
+			g.drawString(d, drawX, drawY);
 			drawY += 10;
+			if (x == pos) break;
+			else d = "";
 		}
-		g.drawString(d, drawX, drawY);
+		
 		if (done) {
 			g.drawString("Press space to continue", GamePanel.WIDTH * GamePanel.SCALE - 250, 95);
 		}
@@ -71,12 +113,12 @@ public class TextEvent {
 	}
 	
 	public void finish(){
-		display = message;
+		pos = display.length();
 		done = true;
 	}
 	
 	public void reset(){
-		display = "";
+		pos = 0;
 		done = false;
 	}
 	

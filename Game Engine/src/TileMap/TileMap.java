@@ -26,9 +26,11 @@ public class TileMap {
 	private int rows, cols;
 	private int height, width;
 	
+	private int drawX, drawY;
+	
 	private int numTilesAcross;
 	
-	private BufferedImage tileMap, background, frame;
+	private BufferedImage tileMap;
 	
 //	spawn enemies 3 tiles before camera
 //	despawn enemies 10 tiles after camera
@@ -44,7 +46,7 @@ public class TileMap {
 	
 	private Enemy[][] enemyData;
 	
-	public TileMap(BufferedImage bg, BufferedImage tm, int[][] td, String[][] ed){
+	public TileMap(BufferedImage tm, int[][] td, String[][] ed){
 		tileMap = tm;
 		
 		tileData = td;
@@ -101,11 +103,9 @@ public class TileMap {
 			
 			liveEnemies = new ArrayList<>();
 		}
-		
 
-		background = bg;
 		
-		frame = new BufferedImage(GamePanel.WIDTH * GamePanel.SCALE, GamePanel.HEIGHT * GamePanel.SCALE, BufferedImage.TYPE_INT_RGB);
+		//frame = new BufferedImage(GamePanel.WIDTH * GamePanel.SCALE, GamePanel.HEIGHT * GamePanel.SCALE, BufferedImage.TYPE_INT_RGB);
 		
 	}
 	
@@ -136,6 +136,8 @@ public class TileMap {
 	public int getTileSize(){ return tileSize; }
 	public int getX(){ return (int)camX; }
 	public int getY(){ return (int)camY; }
+	public int getDrawX(){ return drawX; }
+	public int getDrawY(){ return drawY; }
 	public int getPlayerSpawnX(){ return spawnX * tileSize; }
 	public int getPlayerSpawnY(){ return spawnY * tileSize; }
 	public int getHeight(){ return height; }
@@ -291,31 +293,16 @@ public class TileMap {
 	
 	public void update(Player player){
 		
-		center(player.getX(), player.getY());
-		
 		int numColsToDraw = GamePanel.WIDTH / tileSize + 1;
 		int numRowsToDraw = GamePanel.HEIGHT / tileSize + 1;
 		int colOffset = (int)camX / tileSize;
 		int rowOffset = (int)camY / tileSize;
 		
-		BufferedImage cam = new BufferedImage(numColsToDraw * tileSize * GamePanel.SCALE, 
-											  numRowsToDraw * tileSize * GamePanel.SCALE, 
-											  BufferedImage.TYPE_INT_RGB
-											 );
+		drawX = (int)camX - colOffset * tileSize;
+		drawY = (int)camY - rowOffset * tileSize;
 		
-		Graphics2D camGraphics = (Graphics2D)cam.getGraphics();
-		
-		int draw_x = (int)camX - colOffset * tileSize;
-		int draw_y = (int)camY - rowOffset * tileSize;
-		
-		draw_x *= GamePanel.SCALE;
-		draw_y *= GamePanel.SCALE;
-		
-		camGraphics.drawImage(background.getScaledInstance(GamePanel.WIDTH * GamePanel.SCALE, GamePanel.HEIGHT * GamePanel.SCALE, 0), 
-							  draw_x, 
-							  draw_y, 
-							  null
-							 );
+		drawX *= GamePanel.SCALE;
+		drawY *= GamePanel.SCALE;
 		
 		for (int x = colOffset - 1; x <= colOffset + numColsToDraw; x++){
 			if (x < 0 || x >= cols) continue;
@@ -367,28 +354,28 @@ public class TileMap {
 			}
 		}
 		
-		for (int j = 0; j < numRowsToDraw; j++){
-			int row = rowOffset + j;
-			if (row >= rows) break;
-			for (int i = 0; i < numColsToDraw; i++){
-				int col = colOffset + i;
-				if (col >= cols) break;
-				if (tileData[row][col] == 0) continue;
-				
-				camGraphics.drawImage(tiles[row][col].getImage().getScaledInstance(tileSize * GamePanel.SCALE, tileSize * GamePanel.SCALE, 0),
-									  i * tileSize * GamePanel.SCALE,
-									  j * tileSize * GamePanel.SCALE,
-									  null
-									 );
-				
-			}
-		}
-		
-		frame.getGraphics().drawImage(cam.getSubimage(draw_x, draw_y, GamePanel.WIDTH * GamePanel.SCALE, GamePanel.HEIGHT * GamePanel.SCALE),
-									  0,
-									  0,
-									  null
-									 );
+//		for (int j = 0; j < numRowsToDraw; j++){
+//			int row = rowOffset + j;
+//			if (row >= rows) break;
+//			for (int i = 0; i < numColsToDraw; i++){
+//				int col = colOffset + i;
+//				if (col >= cols) break;
+//				if (tileData[row][col] == 0) continue;
+//				
+//				camGraphics.drawImage(tiles[row][col].getImage().getScaledInstance(tileSize * GamePanel.SCALE, tileSize * GamePanel.SCALE, 0),
+//									  i * tileSize * GamePanel.SCALE,
+//									  j * tileSize * GamePanel.SCALE,
+//									  null
+//									 );
+//				
+//			}
+//		}
+//		
+//		frame.getGraphics().drawImage(cam.getSubimage(drawX, drawY, GamePanel.WIDTH * GamePanel.SCALE, GamePanel.HEIGHT * GamePanel.SCALE),
+//									  0,
+//									  0,
+//									  null
+//									 );
 		
 		//keep working on this
 		
@@ -411,11 +398,31 @@ public class TileMap {
 	
 	public void draw(Graphics2D g){
 		
-		g.drawImage(frame,
-					0, 
-					0, 
-					null
-					);
+//		g.drawImage(frame,
+//					0, 
+//					0, 
+//					null
+//					);
+
+		int colOffset = (int)camX / tileSize;
+		int rowOffset = (int)camY / tileSize;
+		
+		for (int j = 0; j < numRowsToDraw; j++){
+			int row = rowOffset + j;
+			if (row >= rows) break;
+			for (int i = 0; i < numColsToDraw; i++){
+				int col = colOffset + i;
+				if (col >= cols) break;
+				if (tileData[row][col] == 0) continue;
+				
+				g.drawImage(tiles[row][col].getImage().getScaledInstance(tileSize * GamePanel.SCALE, tileSize * GamePanel.SCALE, 0),
+									  i * tileSize * GamePanel.SCALE,
+									  j * tileSize * GamePanel.SCALE,
+									  null
+									 );
+				
+			}
+		}
 		
 		for (Enemy e : liveEnemies){
 			e.draw(g);

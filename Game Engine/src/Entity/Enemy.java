@@ -1,5 +1,8 @@
 package Entity;
 
+import java.awt.Graphics2D;
+
+import Main.GamePanel;
 import TileMap.TileMap;
 
 public abstract class Enemy extends Sprite{
@@ -35,5 +38,13 @@ public abstract class Enemy extends Sprite{
 		
 		return Math.sqrt(deltaX + deltaY);
 		
+	}
+	
+	public void draw(Graphics2D g){
+		g.drawImage(animatino.getImage().getScaledInstance(width * GamePanel.SCALE, height * GamePanel.SCALE, 0),
+				(getX() - tileMap.getX()) * GamePanel.SCALE + tileMap.getDrawX(),
+				(getY() - tileMap.getY()) * GamePanel.SCALE + tileMap.getDrawY(),
+				null
+			   );
 	}
 }

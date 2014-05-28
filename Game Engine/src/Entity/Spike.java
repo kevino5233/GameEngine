@@ -67,11 +67,11 @@ public class Spike extends Enemy{
 	@Override
 	public void draw(Graphics2D g) {
 		// TODO Auto-generated method stub
-		g.drawImage(sprite.getScaledInstance(width * GamePanel.SCALE, height * GamePanel.SCALE, 0),
-				(getX() - tileMap.getX()) * GamePanel.SCALE,
-				(getY() - tileMap.getY()) * GamePanel.SCALE,
-				null
-			   );
+			g.drawImage(sprite.getScaledInstance(width * GamePanel.SCALE, height * GamePanel.SCALE, 0),
+					(getX() - tileMap.getX()) * GamePanel.SCALE + tileMap.getDrawX(),
+					(getY() - tileMap.getY()) * GamePanel.SCALE + tileMap.getDrawY(),
+					null
+				   );
 	}
 
 	@Override

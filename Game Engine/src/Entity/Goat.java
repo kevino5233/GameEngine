@@ -186,11 +186,7 @@ public class Goat extends Enemy{
 	@Override
 	public void draw(Graphics2D g) {
 		// TODO Auto-generated method stub
-		g.drawImage(animatino.getImage().getScaledInstance(width * GamePanel.SCALE, height * GamePanel.SCALE, 0),
-				(getX() - tileMap.getX()) * GamePanel.SCALE,
-				(getY() - tileMap.getY()) * GamePanel.SCALE,
-				null
-			   );
+		super.draw(g);
 	}
 
 	@Override

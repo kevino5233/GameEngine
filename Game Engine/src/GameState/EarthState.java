@@ -5,7 +5,6 @@ import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -33,7 +32,7 @@ public class EarthState extends GameState{
 	
 	private Goat goat1, goat2;
 	
-	private BufferedImage earthGod;
+	private BufferedImage earthGod, bg, frame;
 	private int godX, godY, godWidth, godHeight;
 	
 	private TextEvent earthGodThanks;
@@ -50,8 +49,16 @@ public class EarthState extends GameState{
 		
 		earthGodThanks = new TextEvent("Earth God", "You got the haunted goats! Thank goodness!");
 		
+		int numColsToDraw = GamePanel.WIDTH / TileMap.tileSize;
+		int numRowsToDraw = GamePanel.HEIGHT / TileMap.tileSize;
+		
+		frame = new BufferedImage(((numColsToDraw + 1) * TileMap.tileSize) * GamePanel.SCALE,
+				((numRowsToDraw + 1) * TileMap.tileSize) * GamePanel.SCALE,
+				BufferedImage.TYPE_INT_RGB
+				);
+		
 		try{
-			BufferedImage bg = ImageIO.read(
+			bg = ImageIO.read(
 					this.getClass().getResourceAsStream("/Resources/Backgrounds/cave.png")
 					);
 			earthGod = ImageIO.read(
@@ -63,7 +70,7 @@ public class EarthState extends GameState{
 						this.getClass().getResourceAsStream("/Resources/Tilemaps/earth.png")
 					);
 			
-			tileMap = new TileMap(bg, tilemap, lvmk.getTileTypes(), lvmk.getEnemyData());
+			tileMap = new TileMap(tilemap, lvmk.getTileTypes(), lvmk.getEnemyData());
 			player = new Player(tileMap, gsm.getFire(), gsm.getAir(), gsm.getDifficulty());
 			textEventListener = new TextEventListener();
 			goat1 = new Goat(tileMap, 3 * tileMap.getTileSize(), 27 * tileMap.getTileSize());
@@ -144,6 +151,7 @@ public class EarthState extends GameState{
 		}
 		if (tileMap != null && player != null && !paused && !textEventListener.isPlaying()){
 			if (!player.isDead()) player.update();
+			tileMap.center(player.getX(), player.getY());
 			tileMap.update(player);
 			if (!goat1.isDead()){
 				goat1.update();
@@ -172,8 +180,22 @@ public class EarthState extends GameState{
 			
 			if (tileMap != null && player != null){
 				
-				tileMap.draw(g);
-				player.draw(g);
+				Graphics2D frameGraphics = (Graphics2D)frame.getGraphics();
+				
+				frameGraphics.drawImage(bg.getScaledInstance(GamePanel.WIDTH * GamePanel.SCALE, GamePanel.HEIGHT * GamePanel.SCALE, 0),
+						tileMap.getDrawX(), 
+						tileMap.getDrawY(),
+						null
+						);
+				
+				player.draw(frameGraphics);
+				tileMap.draw(frameGraphics);
+				
+				g.drawImage(frame.getSubimage(tileMap.getDrawX(), tileMap.getDrawY(), GamePanel.WIDTH * GamePanel.SCALE, GamePanel.HEIGHT * GamePanel.SCALE),
+						0,
+						0,
+						null
+						);
 				
 				if (!goat1.isDead() &&
 						goat1.getX() + goat1.getWidth() > tileMap.getX() &&

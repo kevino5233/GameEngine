@@ -217,22 +217,22 @@ public class Player extends Sprite{
 				draw_y = GamePanel.HEIGHT / 2;
 			}
 			g.drawImage(temp.getScaledInstance(getWidth() * GamePanel.SCALE, getHeight() * GamePanel.SCALE, 0), 
-					draw_x * GamePanel.SCALE, 
-					draw_y * GamePanel.SCALE, 
+					draw_x * GamePanel.SCALE + tileMap.getDrawX(), 
+					draw_y * GamePanel.SCALE + tileMap.getDrawY(), 
 					null
 					);
 			if (currentState - 3 >= 0){
 				temp = swordamatino.getImage();
 				if (right){
 					g.drawImage(temp.getScaledInstance(getWidth() * GamePanel.SCALE, getHeight() * GamePanel.SCALE, 0), 
-							(draw_x + width) * GamePanel.SCALE, 
-							draw_y * GamePanel.SCALE, 
+							(draw_x + width) * GamePanel.SCALE + tileMap.getDrawX(), 
+							draw_y * GamePanel.SCALE + tileMap.getDrawY(), 
 							null
 							);
 				} else {
 					g.drawImage(temp.getScaledInstance(getWidth() * GamePanel.SCALE, getHeight() * GamePanel.SCALE, 0), 
-							(draw_x - width) * GamePanel.SCALE, 
-							draw_y * GamePanel.SCALE, 
+							(draw_x - width) * GamePanel.SCALE + tileMap.getDrawX(), 
+							draw_y * GamePanel.SCALE + tileMap.getDrawY(), 
 							null
 							);
 				}

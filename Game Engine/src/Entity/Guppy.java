@@ -13,7 +13,7 @@ public class Guppy extends Enemy{
 	}
 
 	@Override
-	public void getNextPosition(Sprite sp) {
+	public void getNextPosition(Player sp) {
 		// TODO Auto-generated method stub
 		
 	}

@@ -148,22 +148,7 @@ public class Fist extends Enemy{
 
 	@Override
 	public void draw(Graphics2D g) {
-		g.drawImage(animatino.getImage().getScaledInstance(width * GamePanel.SCALE, height * GamePanel.SCALE, 0),
-				(getX() - tileMap.getX()) * GamePanel.SCALE,
-				(getY() - tileMap.getY()) * GamePanel.SCALE,
-				null
-			   );
-		if (currentState == ATTACKING){
-			g.drawString("GG", 
-					(getX() - tileMap.getX()) * GamePanel.SCALE, 
-					((getY() - tileMap.getY()) + getHeight() - 8 * animatino.getFrame()) * GamePanel.SCALE
-					);
-		} else if (currentState == RETREATING){
-			g.drawString("GG", 
-					(getX() - tileMap.getX()) * GamePanel.SCALE, 
-					((getY() - tileMap.getY()) + 8 * animatino.getFrame()) * GamePanel.SCALE
-					);
-		}
+		super.draw(g);
 	}
 
 	@Override
