@@ -2,8 +2,10 @@ package GameState;
 
 import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 
+import javax.imageio.ImageIO;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
@@ -42,10 +44,42 @@ public abstract class GameState {
 	
 	protected PauseState pauseMenu;
 	
-	protected BufferedImage amulet, earthPendant, firePendant, waterPendant, airPendant;
+	protected BufferedImage amulet, earthPendant, firePendant, waterPendant, airPendant, bg;
 	
 	private static Thread sound;
 	private static Clip clip;
+	
+	public GameState(GameStateManager gsm){
+		
+		this.gsm = gsm;
+		
+		pauseMenu = new PauseState(this, gsm);
+		pauseMenu.init();
+		
+		try{
+			amulet = ImageIO.read(
+					this.getClass().getResourceAsStream("/Resources/Sprites/Objects/Amulet/amulet.png")
+				);
+			firePendant = ImageIO.read(
+					this.getClass().getResourceAsStream("/Resources/Sprites/Objects/Amulet/fire.png")
+			);
+			airPendant = ImageIO.read(
+					this.getClass().getResourceAsStream("/Resources/Sprites/Objects/Amulet/air.png")
+			);
+			earthPendant = ImageIO.read(
+					this.getClass().getResourceAsStream("/Resources/Sprites/Objects/Amulet/earth.png")
+			);
+			waterPendant = ImageIO.read(
+					this.getClass().getResourceAsStream("/Resources/Sprites/Objects/Amulet/water.png")
+			);
+		} catch(IOException e){
+			System.out.println("Could not find image GameState");
+			e.printStackTrace();
+		} catch (Exception e){
+			System.out.println("Some other error GameState");
+			e.printStackTrace();
+		}
+	}
 	
 	//initializes variables and stuff
 	public abstract void init();

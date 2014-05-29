@@ -42,10 +42,8 @@ public class EarthState extends GameState{
 	//potentially a SpawnManager for enemies
 	
 	public EarthState(GameStateManager gsm){
-		this.gsm = gsm;
-		
-		pauseMenu = new PauseState(this, gsm);
-		pauseMenu.init();
+
+		super(gsm);
 		
 		earthGodThanks = new TextEvent("Earth God", "You got the haunted goats! Thank goodness!");
 		
@@ -75,21 +73,7 @@ public class EarthState extends GameState{
 			textEventListener = new TextEventListener();
 			goat1 = new Goat(tileMap, 3 * tileMap.getTileSize(), 27 * tileMap.getTileSize());
 			goat2 = new Goat(tileMap, 7 * tileMap.getTileSize(), 26 * tileMap.getTileSize());
-			amulet = ImageIO.read(
-					this.getClass().getResourceAsStream("/Resources/Sprites/Objects/Amulet/amulet.png")
-				);
-			firePendant = ImageIO.read(
-					this.getClass().getResourceAsStream("/Resources/Sprites/Objects/Amulet/fire.png")
-			);
-			airPendant = ImageIO.read(
-					this.getClass().getResourceAsStream("/Resources/Sprites/Objects/Amulet/air.png")
-			);
-			earthPendant = ImageIO.read(
-					this.getClass().getResourceAsStream("/Resources/Sprites/Objects/Amulet/earth.png")
-			);
-			waterPendant = ImageIO.read(
-					this.getClass().getResourceAsStream("/Resources/Sprites/Objects/Amulet/water.png")
-			);
+			
 		} catch (IOException e){
 			System.out.println("Couldn't find something");
 		} catch (Exception e){
@@ -151,8 +135,6 @@ public class EarthState extends GameState{
 		}
 		if (tileMap != null && player != null && !paused && !textEventListener.isPlaying()){
 			if (!player.isDead()) player.update();
-			tileMap.center(player.getX(), player.getY());
-			tileMap.update(player);
 			if (!goat1.isDead()){
 				goat1.getNextPosition(player);
 				goat1.update();
@@ -161,6 +143,8 @@ public class EarthState extends GameState{
 				goat2.getNextPosition(player);
 				goat2.update();
 			}
+			tileMap.center(player.getX(), player.getY());
+			tileMap.update(player);
 		}
 		
 	}
@@ -210,9 +194,10 @@ public class EarthState extends GameState{
 						goat2.getX() < tileMap.getX() + GamePanel.WIDTH && 
 						goat2.getY() + goat2.getHeight() > tileMap.getY() && 
 						goat2.getY() < tileMap.getY() + GamePanel.HEIGHT){
+					System.out.println("Kappa");
 					goat2.draw(g);
 				}
-
+				
 				if (godX + godWidth > tileMap.getX() &&
 						godX < tileMap.getX() + GamePanel.WIDTH && 
 						godY + godHeight > tileMap.getY() && 

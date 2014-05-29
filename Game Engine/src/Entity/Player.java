@@ -210,12 +210,6 @@ public class Player extends Sprite{
 			BufferedImage temp = animatino.getImage();
 			int draw_x = this.getX() - tileMap.getX();
 			int draw_y = this.getY() - tileMap.getY();
-			if (x > GamePanel.WIDTH / 2 && x + width < tileMap.getWidth() - GamePanel.WIDTH){
-				draw_x = GamePanel.WIDTH / 2;
-			}
-			if (y > GamePanel.HEIGHT / 2 && y + height < tileMap.getHeight() - GamePanel.HEIGHT){
-				draw_y = GamePanel.HEIGHT / 2;
-			}
 			g.drawImage(temp.getScaledInstance(getWidth() * GamePanel.SCALE, getHeight() * GamePanel.SCALE, 0), 
 					draw_x * GamePanel.SCALE + tileMap.getDrawX(), 
 					draw_y * GamePanel.SCALE + tileMap.getDrawY(), 

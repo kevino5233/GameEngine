@@ -5,7 +5,6 @@ import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
-import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -27,9 +26,7 @@ public class HubState extends GameState{
 	
 	private TextEventListener textEventListener;
 	
-	private BufferedImage bg;
-	
-	private Rectangle earth, wind, fire, air;
+	private Rectangle earth, water, fire, air;
 	
 	private LevelMakerData lvmk;
 	
@@ -38,10 +35,8 @@ public class HubState extends GameState{
 	//potentially a SpawnManager for enemies
 	
 	public HubState(GameStateManager gsm){
-		this.gsm = gsm;
-		
-		pauseMenu = new PauseState(this, gsm);
-		pauseMenu.init();
+
+		super(gsm);
 
 		fire = new Rectangle(
 				1 * TileMap.tileSize, 
@@ -57,27 +52,18 @@ public class HubState extends GameState{
 				16
 				);
 		
+		water = new Rectangle(
+				14 * TileMap.tileSize,
+				13 * TileMap.tileSize,
+				16,
+				16
+				);
+		
 		try{
 			//tileMap = new TileMap("hub");
 			bg = ImageIO.read(
 						this.getClass().getResourceAsStream("/Resources/Backgrounds/hub.png")
 					);
-			
-			amulet = ImageIO.read(
-						this.getClass().getResourceAsStream("/Resources/Sprites/Objects/Amulet/amulet.png")
-					);
-			firePendant = ImageIO.read(
-					this.getClass().getResourceAsStream("/Resources/Sprites/Objects/Amulet/fire.png")
-			);
-			airPendant = ImageIO.read(
-					this.getClass().getResourceAsStream("/Resources/Sprites/Objects/Amulet/air.png")
-			);
-			earthPendant = ImageIO.read(
-					this.getClass().getResourceAsStream("/Resources/Sprites/Objects/Amulet/earth.png")
-			);
-			waterPendant = ImageIO.read(
-					this.getClass().getResourceAsStream("/Resources/Sprites/Objects/Amulet/water.png")
-			);
 			
 			lvmk = LevelMakerData.parse("hub");
 			tileMap = new TileMap(lvmk.getTileMap(), lvmk.getTileTypes(), lvmk.getEnemyData());
@@ -165,6 +151,55 @@ public class HubState extends GameState{
 					if (gsm.getWater()) g.drawImage(waterPendant, 0, 0, null);
 					if (gsm.getEarth()) g.drawImage(earthPendant, 0, 0, null);
 					
+					if (fire.intersects(
+							new Rectangle(player.getX(), 
+									player.getY(), 
+									player.getWidth(), 
+									player.getHeight()
+									)
+							) && 
+							!gsm.getFire()){
+						g.setFont(new Font("Arial", Font.BOLD, 15));
+						g.setColor(Color.WHITE);
+						g.drawString(
+								"Press Space to enter the Fire level", 
+								(int)fire.getX() * GamePanel.SCALE, 
+								(int)(fire.getY() + 16) * GamePanel.SCALE
+								);
+					} else if (earth.intersects(
+							new Rectangle(
+									player.getX(), 
+									player.getY(), 
+									player.getWidth(), 
+									player.getHeight()
+									)
+							) &&
+							!gsm.getEarth()){
+						g.setFont(new Font("Arial", Font.BOLD, 15));
+						g.setColor(Color.WHITE);
+						g.drawString(
+								"Press Space to enter the Earth level", 
+								(int)earth.getX() * GamePanel.SCALE, 
+								(int)(earth.getY() + 16) * GamePanel.SCALE
+								);
+					} else if (water.intersects(
+							new Rectangle(
+									player.getX(), 
+									player.getY(), 
+									player.getWidth(), 
+									player.getHeight()
+									)
+							) &&
+							!gsm.getWater()){
+						g.setFont(new Font("Arial", Font.BOLD, 15));
+						g.setColor(Color.WHITE);
+						g.drawString(
+								"Press Space to enter the Water level", 
+								(int)(water.getX() - 48) * GamePanel.SCALE, 
+								(int)(water.getY() + 16) * GamePanel.SCALE
+								);
+					}
+					
 				}
 			}
 			if (player.isDead()){
@@ -196,6 +231,11 @@ public class HubState extends GameState{
 					)){
 				stopSound();
 				gsm.setState(GameStateManager.EARTHSTATE);
+			} else if (water.intersects(
+					new Rectangle(player.getX(), player.getY(), player.getWidth(), player.getHeight())
+					)){
+				stopSound();
+				gsm.setState(GameStateManager.WATERSTATE);
 			}
 		}
 		if (paused){

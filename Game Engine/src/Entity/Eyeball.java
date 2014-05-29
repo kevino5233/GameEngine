@@ -49,7 +49,7 @@ public class Eyeball extends Enemy{
 				for (int i = 0; i < numFrames[j]; i++){
 					spriteSheet[j * 2][i] = temp.getSubimage(
 											i * width,
-											j * height,
+											(j * 2) *  height,
 											width,
 											height
 											);
@@ -58,7 +58,7 @@ public class Eyeball extends Enemy{
 				for (int i = 0; i < numFrames[j]; i++){
 					spriteSheet[j * 2 + 1][i] = temp.getSubimage(
 											i * width,
-											j * height,
+											(j * 2 + 1) * height,
 											width,
 											height
 											);
@@ -78,7 +78,12 @@ public class Eyeball extends Enemy{
 	@Override
 	public void getNextPosition(Player sp) {
 		
-		if (sp.isAttacking() && sp.getHitbox().contains(x, y)){
+		if (
+				sp.isAttacking() && 
+				sp.getHitbox().intersects(
+					new Rectangle(getX(), getY(), getWidth(), getHeight())
+				)
+			){
 			playSound("Player/sword_impact");
 			takeDamage(3);
 		}
@@ -108,10 +113,10 @@ public class Eyeball extends Enemy{
 			
 			if (deltaX != 0){
 				if (deltaX < 0){
-					right = false;
+					right = true;
 					dx = terminalVelocity;
 				} else {
-					right = true;
+					right = false;
 					dx = -terminalVelocity;
 				}
 			} else {
@@ -120,10 +125,10 @@ public class Eyeball extends Enemy{
 			
 			if (deltaY != 0){
 				if (deltaY < 0){
-					right = false;
+					right = true;
 					dy = terminalVelocity;
 				} else {
-					right = true;
+					right = false;
 					dy = -terminalVelocity;
 				}
 			} else {
@@ -137,6 +142,18 @@ public class Eyeball extends Enemy{
 			numFramesFrozen++;
 		}
 		
+		if (y < 0) {
+			y = 0;
+		} else if (y + height >= tileMap.getHeight()){
+			y = tileMap.getHeight() - height;
+		}
+		if (x < 0) {
+			x = 0;
+		} else if (x + width >= tileMap.getWidth()){
+			x = tileMap.getWidth() - width;
+		}
+		
+		tileMap.testTouch(this);
 	}
 
 	@Override
@@ -161,12 +178,30 @@ public class Eyeball extends Enemy{
 	@Override
 	public void update() {
 		if (dy != 0 || dx != 0){
-			currentState = MOVING;
-			animatino.setFrames(
-					spriteSheet[MOVING * 2 + (right ? 1 : 0)]
-					, 3
-					, false
-					);
+			if (currentState != MOVING){
+				currentState = MOVING;
+				animatino.setFrames(
+						spriteSheet[MOVING * 2 + (right ? 1 : 0)], 
+						3, 
+						false
+						);
+			} else {
+				if (dx < 0 && right){
+					right = false;
+					animatino.setFrames(
+							spriteSheet[MOVING * 2],
+							3, 
+							false
+							);
+				} else if (dx > 0 && !right){
+					right = true;
+					animatino.setFrames(
+							spriteSheet[MOVING * 2 + 1],
+							3, 
+							false
+							);
+				}
+			}
 		}
 		animatino.update();
 	}

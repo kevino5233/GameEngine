@@ -101,6 +101,9 @@ public class TileMap {
 				case "Eyeball" :
 					enemyData[j][i] = new Eyeball(this, i * tileSize, j * tileSize);
 					break;
+				case "Chernobyl" :
+					enemyData[j][i] = new Chernobyl(this, i * tileSize, j * tileSize);
+					break;
 				}
 			}
 		}
@@ -112,7 +115,6 @@ public class TileMap {
 	}
 	
 	public void init(){
-		center(spawnX * tileSize, spawnY * tileSize);
 		
 		liveEnemies.clear();
 		
@@ -150,7 +152,6 @@ public class TileMap {
 	public int getColsAcross(){ return numColsToDraw; }
 	
 	public Tile getTile(int x, int y){ return tiles[y][x]; }
-	//public Enemy getEnemy(int x, int y) return enemySpawns[y][x]; }
 	
 	public void removeEnemy(Enemy e){ liveEnemies.remove(e); }
 		
@@ -265,9 +266,6 @@ public class TileMap {
 		
 		for (int y = sp.getY(); y < sp.getY() + sp.getHeight(); y += tileSize){
 			int y2 = y / tileSize;
-//			System.out.println(getTile(x1, y2).getType());
-//			System.out.println(getTile(x2, y2).getType());
-//			System.out.println();
 	        
 	        if (y2 < getRows() && getTile(x1, y2).getType() == Tile.BLOCKING){
 	        	int code = Sprite.isTouchingHorizontally(
@@ -356,40 +354,18 @@ public class TileMap {
 			}
 		}
 		
-//		for (int j = 0; j < numRowsToDraw; j++){
-//			int row = rowOffset + j;
-//			if (row >= rows) break;
-//			for (int i = 0; i < numColsToDraw; i++){
-//				int col = colOffset + i;
-//				if (col >= cols) break;
-//				if (tileData[row][col] == 0) continue;
-//				
-//				camGraphics.drawImage(tiles[row][col].getImage().getScaledInstance(tileSize * GamePanel.SCALE, tileSize * GamePanel.SCALE, 0),
-//									  i * tileSize * GamePanel.SCALE,
-//									  j * tileSize * GamePanel.SCALE,
-//									  null
-//									 );
-//				
-//			}
-//		}
-//		
-//		frame.getGraphics().drawImage(cam.getSubimage(drawX, drawY, GamePanel.WIDTH * GamePanel.SCALE, GamePanel.HEIGHT * GamePanel.SCALE),
-//									  0,
-//									  0,
-//									  null
-//									 );
-		
-		//keep working on this
-		
 		for (int i = 0; i < liveEnemies.size(); i++){
 			Enemy e = liveEnemies.get(i);
 			if (e == null) continue;
 			//fix the ranges to allow for one tile outlier?
-			if (//!e.isActive() ||
+			if (	
+					!e.isActive() ||
 					e.getX() + e.getWidth() < camX - tileSize ||
 					e.getX() > camX + GamePanel.WIDTH + tileSize || 
 					e.getY() + e.getHeight() < camY - tileSize || 
-					e.getY() > camY + GamePanel.HEIGHT + tileSize){
+					e.getY() > camY + GamePanel.HEIGHT + tileSize
+				
+				){
 				e.die();
 			} else {
 				e.getNextPosition(player);
@@ -429,10 +405,6 @@ public class TileMap {
 		for (Enemy e : liveEnemies){
 			e.draw(g);
 		}
-		
-//		if (textEventListener.isPlaying()){
-//			textEventListener.draw(g);
-//		}
 		
 	}
 }

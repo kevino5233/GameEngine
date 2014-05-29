@@ -35,6 +35,7 @@ public class GameStateManager {
 		gameStates[HUBSTATE] = new HubState(this);
 		gameStates[FIRESTATE] = new FireState(this);
 		gameStates[EARTHSTATE] = new EarthState(this);
+		gameStates[WATERSTATE] = new WaterState(this);
 		
 		username = "";
 		password = "";

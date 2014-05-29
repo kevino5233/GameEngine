@@ -43,10 +43,8 @@ public class FireState extends GameState{
 	//potentially a SpawnManager for enemies
 	
 	public FireState(GameStateManager gsm){
-		this.gsm = gsm;
 		
-		pauseMenu = new PauseState(this, gsm);
-		pauseMenu.init();
+		super(gsm);
 		
 		fireGodThanks = new TextEvent(
 				"Fire God", 
@@ -79,21 +77,6 @@ public class FireState extends GameState{
 					this.getClass().getResourceAsStream("/Resources/Backgrounds/fire.png")
 					);
 			
-			amulet = ImageIO.read(
-					this.getClass().getResourceAsStream("/Resources/Sprites/Objects/Amulet/amulet.png")
-				);
-			firePendant = ImageIO.read(
-					this.getClass().getResourceAsStream("/Resources/Sprites/Objects/Amulet/fire.png")
-			);
-			airPendant = ImageIO.read(
-					this.getClass().getResourceAsStream("/Resources/Sprites/Objects/Amulet/air.png")
-			);
-			earthPendant = ImageIO.read(
-					this.getClass().getResourceAsStream("/Resources/Sprites/Objects/Amulet/earth.png")
-			);
-			waterPendant = ImageIO.read(
-					this.getClass().getResourceAsStream("/Resources/Sprites/Objects/Amulet/water.png")
-			);
 			lvmk = LevelMakerData.parse("fire");
 			tileMap = new TileMap(lvmk.getTileMap(), lvmk.getTileTypes(), lvmk.getEnemyData());
 			player = new Player(tileMap, gsm.getFire(), gsm.getAir(), gsm.getDifficulty());
@@ -183,15 +166,13 @@ public class FireState extends GameState{
 	public void draw(Graphics2D g) {
 
 		try{
-//			g.drawImage(bg.getScaledInstance(GamePanel.WIDTH * GamePanel.SCALE, GamePanel.HEIGHT * GamePanel.SCALE, 0), 
-//					0, 
-//					0, 
-//					null
-//					);
 			if (paused){
 				pauseMenu.draw(g);
 			} else {
-				if (tileMap != null && player != null){
+
+				if (textEventListener != null && textEventListener.isPlaying()){
+					textEventListener.draw(g);
+				} else if (tileMap != null && player != null){
 					
 					Graphics2D frameGraphics = (Graphics2D)frame.getGraphics();
 					
@@ -221,9 +202,6 @@ public class FireState extends GameState{
 									null
 								   );
 								}
-					}
-					if (textEventListener != null && textEventListener.isPlaying()){
-						textEventListener.draw(g);
 					}
 					g.setColor(Color.BLACK);
 					g.setFont(new Font("Times New Roman", Font.BOLD, 10));

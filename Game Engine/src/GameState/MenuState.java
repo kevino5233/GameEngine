@@ -28,8 +28,6 @@ import Main.GamePanel;
 
 public class MenuState extends GameState implements ActionListener{
 
-	BufferedImage bg;
-	
 	private int pos;
 	private int dpos;
 	private String[] options;
@@ -52,7 +50,8 @@ public class MenuState extends GameState implements ActionListener{
 	private JFrame passwordFrame;
 	
 	public MenuState(GameStateManager gsm){
-		this.gsm = gsm;	
+
+		super(gsm);
 		
 		menuFont = new Font("Times New Roman", Font.PLAIN, 30);
 		creditsFont = new Font("Times New Roman", Font.PLAIN, 15);
