@@ -8,7 +8,7 @@ import java.io.IOException;
 
 public class GameStateManager {
 
-	private static GameState[] gameStates = new GameState[5];
+	private static GameState[] gameStates = new GameState[6];
 	
 	private String username, password;
 	
@@ -36,6 +36,7 @@ public class GameStateManager {
 		gameStates[FIRESTATE] = new FireState(this);
 		gameStates[EARTHSTATE] = new EarthState(this);
 		gameStates[WATERSTATE] = new WaterState(this);
+		gameStates[AIRSTATE] = new AirState(this);
 		
 		username = "";
 		password = "";

@@ -85,6 +85,11 @@ public class EarthState extends GameState{
 	@Override
 	public void init() {
 		
+		goat1.spawn();
+		goat2.spawn();
+		player.spawn();
+		
+		tileMap.center(player.getX(), player.getY());
 		tileMap.init();
 		
 		earthGodThanks.reset();
@@ -93,10 +98,6 @@ public class EarthState extends GameState{
 		godY = 14 * TileMap.tileSize;
 		godWidth = earthGod.getWidth();
 		godHeight = earthGod.getHeight();
-		
-		goat1.spawn();
-		goat2.spawn();
-		player.spawn();
 		
 		ArrayList<String> textEvents = lvmk.getEvents();
 		for (String s : textEvents){
@@ -135,6 +136,8 @@ public class EarthState extends GameState{
 		}
 		if (tileMap != null && player != null && !paused && !textEventListener.isPlaying()){
 			if (!player.isDead()) player.update();
+			tileMap.center(player.getX(), player.getY());
+			tileMap.update(player);
 			if (!goat1.isDead()){
 				goat1.getNextPosition(player);
 				goat1.update();
@@ -143,8 +146,6 @@ public class EarthState extends GameState{
 				goat2.getNextPosition(player);
 				goat2.update();
 			}
-			tileMap.center(player.getX(), player.getY());
-			tileMap.update(player);
 		}
 		
 	}
@@ -153,90 +154,85 @@ public class EarthState extends GameState{
 	public void draw(Graphics2D g) {
 
 		try{
-//			g.drawImage(bg.getScaledInstance(GamePanel.WIDTH * GamePanel.SCALE, GamePanel.HEIGHT * GamePanel.SCALE, 0), 
-//					0, 
-//					0, 
-//					null
-//					);
-		if (paused){
-			pauseMenu.draw(g);
-		} else {
-			
-			if (tileMap != null && player != null){
-				
-				Graphics2D frameGraphics = (Graphics2D)frame.getGraphics();
-				
-				frameGraphics.drawImage(bg.getScaledInstance(GamePanel.WIDTH * GamePanel.SCALE, GamePanel.HEIGHT * GamePanel.SCALE, 0),
-						tileMap.getDrawX(), 
-						tileMap.getDrawY(),
-						null
-						);
-				
-				player.draw(frameGraphics);
-				tileMap.draw(frameGraphics);
-				
-				g.drawImage(frame.getSubimage(tileMap.getDrawX(), tileMap.getDrawY(), GamePanel.WIDTH * GamePanel.SCALE, GamePanel.HEIGHT * GamePanel.SCALE),
-						0,
-						0,
-						null
-						);
-				
-				if (!goat1.isDead() &&
-						goat1.getX() + goat1.getWidth() > tileMap.getX() &&
-						goat1.getX() < tileMap.getX() + GamePanel.WIDTH && 
-						goat1.getY() + goat1.getHeight() > tileMap.getY() && 
-						goat1.getY() < tileMap.getY() + GamePanel.HEIGHT){
-							goat1.draw(g);
-						}
+			if (paused){
+				pauseMenu.draw(g);
+			} else {
 
-				if (!goat2.isDead() &&
-						goat2.getX() + goat2.getWidth() > tileMap.getX() &&
-						goat2.getX() < tileMap.getX() + GamePanel.WIDTH && 
-						goat2.getY() + goat2.getHeight() > tileMap.getY() && 
-						goat2.getY() < tileMap.getY() + GamePanel.HEIGHT){
-					System.out.println("Kappa");
-					goat2.draw(g);
-				}
-				
-				if (godX + godWidth > tileMap.getX() &&
-						godX < tileMap.getX() + GamePanel.WIDTH && 
-						godY + godHeight > tileMap.getY() && 
-						godY < tileMap.getY() + GamePanel.HEIGHT){
-					g.drawImage(
-							earthGod.getScaledInstance
-							(godWidth * GamePanel.SCALE, godHeight * GamePanel.SCALE, 0),
-							(godX - tileMap.getX()) * GamePanel.SCALE,
-							(godY - tileMap.getY()) * GamePanel.SCALE,
+				if (tileMap != null && player != null){
+
+					Graphics2D frameGraphics = (Graphics2D)frame.getGraphics();
+
+					frameGraphics.drawImage(bg.getScaledInstance(GamePanel.WIDTH * GamePanel.SCALE, GamePanel.HEIGHT * GamePanel.SCALE, 0),
+							tileMap.getDrawX(), 
+							tileMap.getDrawY(),
 							null
 							);
-				}
-				g.setColor(Color.BLACK);
-				g.setFont(new Font("Times New Roman", Font.BOLD, 10));
-				g.drawString("Health", 60, 10);
-				g.setColor(Color.RED);
-				g.drawRect(75, 15, player.getMaxHealth() * 10, 10);
-				g.fillRect(75, 15, player.getHealth() * 10, 10);
 
-				g.drawImage(amulet, 0, 0, null);
-				if (gsm.getFire()) g.drawImage(firePendant, 0, 0, null);
-				if (gsm.getAir()) g.drawImage(airPendant, 0, 0, null);
-				if (gsm.getWater()) g.drawImage(waterPendant, 0, 0, null);
-				if (gsm.getEarth()) g.drawImage(earthPendant, 0, 0, null);
-				
-				if (textEventListener != null && textEventListener.isPlaying()){
-					textEventListener.draw(g);
+					player.draw(frameGraphics);
+					tileMap.draw(frameGraphics);
+
+					if (!goat1.isDead() &&
+							goat1.getX() + goat1.getWidth() > tileMap.getX() &&
+							goat1.getX() < tileMap.getX() + GamePanel.WIDTH && 
+							goat1.getY() + goat1.getHeight() > tileMap.getY() && 
+							goat1.getY() < tileMap.getY() + GamePanel.HEIGHT){
+						goat1.draw(frameGraphics);
+					}
+
+					if (!goat2.isDead() &&
+							goat2.getX() + goat2.getWidth() > tileMap.getX() &&
+							goat2.getX() < tileMap.getX() + GamePanel.WIDTH && 
+							goat2.getY() + goat2.getHeight() > tileMap.getY() && 
+							goat2.getY() < tileMap.getY() + GamePanel.HEIGHT){
+						goat2.draw(frameGraphics);
+					}
+
+					g.drawImage(frame.getSubimage(tileMap.getDrawX(), tileMap.getDrawY(), GamePanel.WIDTH * GamePanel.SCALE, GamePanel.HEIGHT * GamePanel.SCALE),
+							0,
+							0,
+							null
+							);
+
+
+					if (godX + godWidth > tileMap.getX() &&
+							godX < tileMap.getX() + GamePanel.WIDTH && 
+							godY + godHeight > tileMap.getY() && 
+							godY < tileMap.getY() + GamePanel.HEIGHT){
+						g.drawImage(
+								earthGod.getScaledInstance
+								(godWidth * GamePanel.SCALE, godHeight * GamePanel.SCALE, 0),
+								(godX - tileMap.getX()) * GamePanel.SCALE,
+								(godY - tileMap.getY()) * GamePanel.SCALE,
+								null
+								);
+					}
+					g.setColor(Color.BLACK);
+					g.setFont(new Font("Times New Roman", Font.BOLD, 10));
+					g.drawString("Health", 60, 10);
+					g.setColor(Color.RED);
+					g.drawRect(75, 15, player.getMaxHealth() * 10, 10);
+					g.fillRect(75, 15, player.getHealth() * 10, 10);
+
+					g.drawImage(amulet, 0, 0, null);
+					if (gsm.getFire()) g.drawImage(firePendant, 0, 0, null);
+					if (gsm.getAir()) g.drawImage(airPendant, 0, 0, null);
+					if (gsm.getWater()) g.drawImage(waterPendant, 0, 0, null);
+					if (gsm.getEarth()) g.drawImage(earthPendant, 0, 0, null);
+
+					if (textEventListener != null && textEventListener.isPlaying()){
+						textEventListener.draw(g);
+					}
+
 				}
-				
+
+
 			}
-
-			
-		}
-		if (player.isDead()){
-			g.setFont(new Font("Times New Roman", Font.BOLD, 30));
-			g.setColor(Color.RED);
-			g.drawString("You are dead", 50, 50);
-			g.drawString("Press space to retry", 50, 100);
-		}
+			if (player.isDead()){
+				g.setFont(new Font("Times New Roman", Font.BOLD, 30));
+				g.setColor(Color.RED);
+				g.drawString("You are dead", 50, 50);
+				g.drawString("Press space to retry", 50, 100);
+			}
 		} catch (NullPointerException e){
 			System.out.println("Shit be null");
 			e.printStackTrace();
@@ -256,6 +252,7 @@ public class EarthState extends GameState{
 				
 			}
 			if (player.isDead()){
+				stopSound();
 				init();
 			}
 		} else if (k == KeyEvent.VK_ESCAPE){

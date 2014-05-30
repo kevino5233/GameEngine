@@ -55,7 +55,7 @@ public class Player extends Sprite{
 		framesInvincible = 30;
 		framesLeftInvincible = 0;
 		
-		terminalVelocity = air ? 20 : 10;
+		terminalVelocity = air ? 10 : 8;
 		jumpStart = -terminalVelocity;
 		
 		right = true;
@@ -372,7 +372,7 @@ public class Player extends Sprite{
 		if (!super.isDead()){
 			switch(k){
 			case KeyEvent.VK_UP : 
-				if (currentState != JUMPING){
+				if (currentState != JUMPING && currentState != JUMPATTACK){
 					dy = jumpStart;
 					jump();
 				}

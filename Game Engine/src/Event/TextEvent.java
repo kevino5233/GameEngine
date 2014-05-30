@@ -55,10 +55,6 @@ public class TextEvent {
 		}
 		display += d + word;
 		
-		System.out.println(display);
-		System.out.println(message);
-		System.out.println();
-		
 		try{
 			box = ImageIO.read(new File("./Resources/Sprites/Objects/Textbox.png"));
 		} catch (IOException e){

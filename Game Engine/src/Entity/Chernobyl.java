@@ -37,7 +37,7 @@ public class Chernobyl extends Enemy{
 		width = 64;
 		
 		numFramesWiggle = 56;
-		framesToSpawn = 103;
+		framesToSpawn = 153;
 		
 		terminalVelocity = 1;
 		
@@ -155,7 +155,7 @@ public class Chernobyl extends Enemy{
 		if (currentState == SPAWN){
 			if (animatino.hasPlayedOnce()){
 				currentState = WIGGLE;
-				animatino.setFrames(spriteSheet[WIGGLE], 2, false);
+				animatino.setFrames(spriteSheet[WIGGLE], 3, false);
 			}
 		} else {
 			if (framesUntilSpawn == framesToSpawn){

@@ -5,6 +5,7 @@ import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -57,6 +58,12 @@ public class HubState extends GameState{
 				13 * TileMap.tileSize,
 				16,
 				16
+				);
+		
+		air = new Rectangle(
+				5 * TileMap.tileSize,
+				9 * TileMap.tileSize,
+				16, 16
 				);
 		
 		try{
@@ -151,55 +158,6 @@ public class HubState extends GameState{
 					if (gsm.getWater()) g.drawImage(waterPendant, 0, 0, null);
 					if (gsm.getEarth()) g.drawImage(earthPendant, 0, 0, null);
 					
-					if (fire.intersects(
-							new Rectangle(player.getX(), 
-									player.getY(), 
-									player.getWidth(), 
-									player.getHeight()
-									)
-							) && 
-							!gsm.getFire()){
-						g.setFont(new Font("Arial", Font.BOLD, 15));
-						g.setColor(Color.WHITE);
-						g.drawString(
-								"Press Space to enter the Fire level", 
-								(int)fire.getX() * GamePanel.SCALE, 
-								(int)(fire.getY() + 16) * GamePanel.SCALE
-								);
-					} else if (earth.intersects(
-							new Rectangle(
-									player.getX(), 
-									player.getY(), 
-									player.getWidth(), 
-									player.getHeight()
-									)
-							) &&
-							!gsm.getEarth()){
-						g.setFont(new Font("Arial", Font.BOLD, 15));
-						g.setColor(Color.WHITE);
-						g.drawString(
-								"Press Space to enter the Earth level", 
-								(int)earth.getX() * GamePanel.SCALE, 
-								(int)(earth.getY() + 16) * GamePanel.SCALE
-								);
-					} else if (water.intersects(
-							new Rectangle(
-									player.getX(), 
-									player.getY(), 
-									player.getWidth(), 
-									player.getHeight()
-									)
-							) &&
-							!gsm.getWater()){
-						g.setFont(new Font("Arial", Font.BOLD, 15));
-						g.setColor(Color.WHITE);
-						g.drawString(
-								"Press Space to enter the Water level", 
-								(int)(water.getX() - 48) * GamePanel.SCALE, 
-								(int)(water.getY() + 16) * GamePanel.SCALE
-								);
-					}
-					
 				}
 			}
 			if (player.isDead()){
@@ -236,6 +194,11 @@ public class HubState extends GameState{
 					)){
 				stopSound();
 				gsm.setState(GameStateManager.WATERSTATE);
+			} else if (air.intersects(
+					new Rectangle(player.getX(), player.getY(), player.getWidth(), player.getHeight())
+					)){
+				stopSound();
+				gsm.setState(GameStateManager.AIRSTATE);
 			}
 		}
 		if (paused){

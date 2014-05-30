@@ -94,7 +94,7 @@ public class Eyeball extends Enemy{
 		
 		
 		if (code != -1){
-			sp.takeDamage(3);
+			sp.takeDamage(1);
 			currentState = IDLE;
 			dy = dx = 0;
 			if (right){

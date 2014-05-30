@@ -79,7 +79,7 @@ public class Bat extends Enemy{
 				  					 new Rectangle(sp.getX(), sp.getY(), sp.getWidth(), sp.getHeight())
 				 					);
 		if (code != -1){
-			sp.takeDamage(3);
+			sp.takeDamage(1);
 		}
 		
 		if (x == endX && y == endY){
