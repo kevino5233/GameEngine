@@ -67,7 +67,9 @@ public class Goat extends Enemy{
 		spriteSheet = new BufferedImage[4][];
 
 		try{
-			BufferedImage temp = ImageIO.read(new File("./Resources/Sprites/Enemies/goat.png"));
+			BufferedImage temp = ImageIO.read(
+					this.getClass().getResourceAsStream("/Resources/Sprites/Enemies/goat.png")
+					);
 			for (int j = 0; j < spriteSheet.length / 2; j++){	
 				spriteSheet[j * 2] = new BufferedImage[numFrames[j]];
 				spriteSheet[j * 2 + 1] = new BufferedImage[numFrames[j]];
@@ -100,7 +102,7 @@ public class Goat extends Enemy{
 		   ){
 			playSound("Player/sword_impact");
 			framesLeftInvincible = framesInvincible;
-			takeDamage(3);
+			takeDamage(Player.getDamage());
 		}
 		
 		int code = Sprite.isTouching(new Rectangle((int)x, (int)y, width, height),

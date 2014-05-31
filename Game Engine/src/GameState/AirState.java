@@ -62,7 +62,7 @@ public class AirState extends GameState{
 					);
 			
 			tileMap = new TileMap(tilemap, lvmk.getTileTypes(), lvmk.getEnemyData());
-			player = new Player(tileMap, gsm.getFire(), gsm.getAir(), gsm.getDifficulty());
+			player = new Player(tileMap, gsm.getDifficulty());
 			nuclearDisaster = new Fukushima(tileMap, 0, 0);
 			textEventListener = new TextEventListener();
 			
@@ -83,6 +83,8 @@ public class AirState extends GameState{
 		
 		tileMap.center(player.getX(), player.getY());
 		tileMap.init();
+		
+		airGodThanks.reset();
 		
 		getRadiated = false;
 		
@@ -107,10 +109,7 @@ public class AirState extends GameState{
 						gsm.complete(GameStateManager.AIRSTATE);
 						gsm.setState(GameStateManager.HUBSTATE);
 					} else {
-						textEventListener.playMessage(
-								player.getX() / TileMap.tileSize, 
-								player.getY() / TileMap.tileSize
-								);
+						textEventListener.playMessage(airGodThanks);
 					}
 				}
 				
@@ -120,12 +119,14 @@ public class AirState extends GameState{
 			}	
 		}
 		if (tileMap != null && player != null && !paused && !textEventListener.isPlaying()){
-			if (!player.isDead()) player.update();
-			if (getRadiated && !nuclearDisaster.isDead()) {
-				nuclearDisaster.getNextPosition(player);
-				nuclearDisaster.update();
-			} else if (player.getX() <= GamePanel.HEIGHT){
-				getRadiated = true;
+			if (!player.isDead()){
+				player.update();
+				if (getRadiated && !nuclearDisaster.isDead()) {
+					nuclearDisaster.getNextPosition(player);
+					nuclearDisaster.update();
+				} else if (player.getX() <= GamePanel.HEIGHT){
+					getRadiated = true;
+				}
 			}
 			tileMap.center(player.getX(), player.getY());
 			tileMap.update(player);

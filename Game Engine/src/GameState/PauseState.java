@@ -51,7 +51,9 @@ public class PauseState implements ActionListener{
 		infoFont = new Font("Times New Roman", Font.PLAIN, 10);
 		
 		try{
-			background = ImageIO.read(new File("./Resources/Sprites/Objects/menu.png"));
+			background = ImageIO.read(
+					this.getClass().getResourceAsStream("/Resources/Sprites/Objects/menu.png")
+					);
 			
 		} catch (IOException e){
 			System.out.println("Couldn't find file");

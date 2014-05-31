@@ -79,7 +79,7 @@ public class FireState extends GameState{
 			
 			lvmk = LevelMakerData.parse("fire");
 			tileMap = new TileMap(lvmk.getTileMap(), lvmk.getTileTypes(), lvmk.getEnemyData());
-			player = new Player(tileMap, gsm.getFire(), gsm.getAir(), gsm.getDifficulty());
+			player = new Player(tileMap, gsm.getDifficulty());
 			textEventListener = new TextEventListener();
 			
 		} catch (IOException e){

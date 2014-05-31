@@ -106,7 +106,7 @@ public class Chernobyl extends Enemy{
 			   ){
 				playSound("Player/sword_impact");
 				framesLeftInvincible = framesInvincible;
-				takeDamage(3);
+				takeDamage(Player.getDamage());
 			}
 		
 		int code = Sprite.isTouching(new Rectangle((int)x, (int)y, width, height),

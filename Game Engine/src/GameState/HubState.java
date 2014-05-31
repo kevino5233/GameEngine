@@ -74,7 +74,7 @@ public class HubState extends GameState{
 			
 			lvmk = LevelMakerData.parse("hub");
 			tileMap = new TileMap(lvmk.getTileMap(), lvmk.getTileTypes(), lvmk.getEnemyData());
-			player = new Player(tileMap, gsm.getFire(), gsm.getAir(), gsm.getDifficulty());
+			player = new Player(tileMap, gsm.getDifficulty());
 			textEventListener = new TextEventListener();
 			
 			
@@ -182,22 +182,18 @@ public class HubState extends GameState{
 			} else if (fire.intersects(
 					new Rectangle(player.getX(), player.getY(), player.getWidth(), player.getHeight())
 					)){
-				stopSound();
 				gsm.setState(GameStateManager.FIRESTATE);
 			} else if (earth.intersects(
 					new Rectangle(player.getX(), player.getY(), player.getWidth(), player.getHeight())
 					)){
-				stopSound();
 				gsm.setState(GameStateManager.EARTHSTATE);
 			} else if (water.intersects(
 					new Rectangle(player.getX(), player.getY(), player.getWidth(), player.getHeight())
 					)){
-				stopSound();
 				gsm.setState(GameStateManager.WATERSTATE);
 			} else if (air.intersects(
 					new Rectangle(player.getX(), player.getY(), player.getWidth(), player.getHeight())
 					)){
-				stopSound();
 				gsm.setState(GameStateManager.AIRSTATE);
 			}
 		}

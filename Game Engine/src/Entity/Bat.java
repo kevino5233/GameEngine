@@ -72,7 +72,7 @@ public class Bat extends Enemy{
 		
 		if (sp.isAttacking() && sp.getHitbox().contains(x, y)){
 			playSound("Player/sword_impact");
-			takeDamage(3);
+			takeDamage(Player.getDamage());
 		}
 		
 		int code = Sprite.isTouching(new Rectangle((int)x, (int)y, width, height),

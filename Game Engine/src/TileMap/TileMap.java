@@ -64,7 +64,7 @@ public class TileMap {
 				int type = tileData[j][i];
 				tiles[j][i] = new Tile(tileMap.getSubimage(type % numTilesAcross * tileSize, 
 														   type / numTilesAcross * tileSize, 
-													   tileSize, 
+														   tileSize, 
 														   tileSize), 
 														   type / w);
 			}	
@@ -103,6 +103,9 @@ public class TileMap {
 					break;
 				case "Chernobyl" :
 					enemyData[j][i] = new Chernobyl(this, i * tileSize, j * tileSize);
+					break;
+				case "Fish" :
+					enemyData[j][i] = new Fish(this, i * tileSize, j * tileSize);
 					break;
 				}
 			}

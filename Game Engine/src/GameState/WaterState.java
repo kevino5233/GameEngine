@@ -10,7 +10,9 @@ import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
 
+import Entity.Animation;
 import Entity.Player;
+import Entity.Shark;
 import Event.TextEvent;
 import Event.TextEventListener;
 import LevelMaker.LevelMakerData;
@@ -19,13 +21,17 @@ import TileMap.TileMap;
 
 public class WaterState extends GameState{
 	
-	private int boatHealth, boatMaxHealth;
+	private static int boatHealth, boatMaxHealth;
 	
 	private int framesFreeze, framesFrozen, 
 				mapX, bgX,
 				mapDx, bgDx;
 	
 	private Player player;
+	
+	private Shark jaws;
+	
+	private Animation animatino;
 	
 	private TileMap tileMap;
 	
@@ -36,7 +42,7 @@ public class WaterState extends GameState{
 	
 	private LevelMakerData lvmk;
 	
-	private BufferedImage frame;
+	private BufferedImage frame, waterGod;
 	
 	public WaterState(GameStateManager gsm){
 		
@@ -53,7 +59,7 @@ public class WaterState extends GameState{
 
 		framesFreeze = framesFrozen = 10;
 
-		boatMaxHealth = 15;
+		boatMaxHealth = 14;
 		
 		waterLevelStart = new TextEvent(
 				"NPC",
@@ -70,6 +76,26 @@ public class WaterState extends GameState{
 		
 		try{
 			
+			int boatSide = 32;
+			
+			BufferedImage boat = ImageIO.read(
+					getClass().getResourceAsStream("/Resources/Sprites/Objects/boat.png")
+					);
+			
+			BufferedImage[] boatSheet = new BufferedImage[5]; 
+			
+			for (int i = 0; i < 5; i++){
+				boatSheet[i] = boat.getSubimage(
+						i * boatSide,
+						0,
+						boatSide,
+						boatSide
+						);
+			}
+			
+			animatino = new Animation();
+			animatino.setFrames(boatSheet, 15, false);
+			
 			bg = ImageIO.read(
 					getClass().getResourceAsStream("/Resources/Backgrounds/water.png")
 					);
@@ -82,7 +108,8 @@ public class WaterState extends GameState{
 					lvmk.getTileTypes(), 
 					lvmk.getEnemyData()
 					);
-			player = new Player(tileMap, gsm.getFire(), gsm.getAir(), gsm.getDifficulty());
+			player = new Player(tileMap, gsm.getDifficulty());
+			jaws = new Shark(tileMap);
 			textEventListener = new TextEventListener();
 			
 		} catch (IOException e){
@@ -145,8 +172,12 @@ public class WaterState extends GameState{
 		}
 		if (tileMap != null && player != null && !paused && !textEventListener.isPlaying()){
 			mapX += mapDx;
+			bgX--;
 			if (mapX == 2){
 				textEventListener.playMessage(waterLevelStart);
+			}
+			if (bgX < 0){
+				bgX += bg.getWidth();
 			}
 			if (framesFrozen == framesFreeze){
 				bgX += bgDx;
@@ -154,6 +185,15 @@ public class WaterState extends GameState{
 				framesFrozen = 0;
 			} else {
 				framesFrozen++;
+			}
+			animatino.update();
+			if (!jaws.isActive()){
+				if (mapX >= GamePanel.WIDTH){
+					jaws.spawn();
+				}
+			} else {
+				jaws.getNextPosition(player);
+				jaws.update();
 			}
 			if (!player.isDead()) player.update();
 			tileMap.center(mapX, 0);
@@ -191,9 +231,26 @@ public class WaterState extends GameState{
 								);
 						
 					}
-					
-					player.draw(frameGraphics);
-					tileMap.draw(frameGraphics);
+					frameGraphics.drawImage(
+							animatino.getImage().getScaledInstance(64, 64, 0),
+							(GamePanel.WIDTH / 2 - 16) * GamePanel.SCALE + tileMap.getDrawX(),
+							(GamePanel.HEIGHT / 2 + 16 + (animatino.getFrame() % 2 == 0 ? 2 : 0)) * GamePanel.SCALE + tileMap.getDrawY(),
+							null
+							);
+					if (!jaws.isActive()){
+						player.draw(frameGraphics);
+						tileMap.draw(frameGraphics);
+					} else {
+						if (jaws.isFalling()){
+							player.draw(frameGraphics);
+							tileMap.draw(frameGraphics);
+							jaws.draw(frameGraphics);
+						} else {
+							jaws.draw(frameGraphics);
+							player.draw(frameGraphics);
+							tileMap.draw(frameGraphics);
+						}
+					}
 					
 					g.drawImage(frame.getSubimage(tileMap.getDrawX(), tileMap.getDrawY(), GamePanel.WIDTH * GamePanel.SCALE, GamePanel.HEIGHT * GamePanel.SCALE),
 							0,
@@ -207,6 +264,13 @@ public class WaterState extends GameState{
 					g.setColor(Color.RED);
 					g.drawRect(75, 15, player.getMaxHealth() * 10, 10);
 					g.fillRect(75, 15, player.getHealth() * 10, 10);
+					
+					g.setColor(Color.BLACK);
+					g.setFont(new Font("Times New Roman", Font.BOLD, 10));
+					g.drawString("Boat Health", (GamePanel.WIDTH - 10) * GamePanel.SCALE, 10);
+					g.setColor(Color.BLUE);
+					g.drawRect((GamePanel.WIDTH - 100) * GamePanel.SCALE, 15, boatMaxHealth * 10, 10);
+					g.fillRect((GamePanel.WIDTH - 100) * GamePanel.SCALE, 15, boatHealth * 10, 10);
 
 					g.drawImage(amulet, 0, 0, null);
 					if (gsm.getFire()) g.drawImage(firePendant, 0, 0, null);
@@ -219,6 +283,14 @@ public class WaterState extends GameState{
 						g.setColor(Color.RED);
 						g.drawString("You are dead", 50, 50);
 						g.drawString("Press space to retry", 50, 100);
+					}
+					
+					if (boatHealth < 0){
+						g.setFont(new Font("Times New Roman", Font.BOLD, 30));
+						g.setColor(Color.RED);
+						g.drawString("You are dead", 50, 50);
+						g.drawString("Press space to retry", 50, 100);
+
 					}
 				}
 			}
@@ -249,6 +321,13 @@ public class WaterState extends GameState{
 			pauseMenu.keyReleased(k);
 		}
 		player.keyReleased(k);
+	}
+
+	public static void damageBoat(int damage){
+		boatHealth -= damage;
+		if (boatHealth <= 0){
+			//do something
+		}
 	}
 	
 }

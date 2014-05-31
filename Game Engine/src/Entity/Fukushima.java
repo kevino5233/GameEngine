@@ -137,7 +137,8 @@ public class Fukushima extends Enemy{
 				){
 			playSound("Player/sword_impact");
 			framesLeftInvincible = framesInvincible;
-			takeDamage(3);
+			takeDamage(Player.getDamage());
+			System.out.println(health);
 		}
 
 		int code = Sprite.isTouching(new Rectangle(getX() + 137, getY(), 46, 76),
@@ -152,19 +153,19 @@ public class Fukushima extends Enemy{
 	@Override
 	public void update() {
 		if (currentState == DAWOOP){
-			laserAnimatino.update();
+			
 			if (framesFired++ == framesFire){
 				framesFired = 0;
 				currentState = IDLE;
 				animatino.setFrames(spriteSheet[IDLE], 1, true);
 			} else {
-				//update laser animation
+				laserAnimatino.update();
 			}
 		}else if (currentState == SHOOP){
 			if (animatino.hasPlayedOnce()){
 				currentState = DAWOOP;
 				animatino.setFrames(spriteSheet[DAWOOP], 3, false);
-				laserAnimatino.setFrames(laserSpriteSheet, 3, true);
+				laserAnimatino.setFrames(laserSpriteSheet, 1, true);
 				//set laser animation
 			}
 		}else if (currentState == IDLE){
@@ -217,6 +218,7 @@ public class Fukushima extends Enemy{
 	public void die() {
 		//death animation? + corpse?
 		active = false;
+		animatino.setFrames(spriteSheet[IDLE], 1, true);
 	}
 
 	@Override

@@ -30,7 +30,7 @@ public class EarthState extends GameState{
 	
 	private LevelMakerData lvmk;
 	
-	private Goat goat1, goat2;
+	private Goat goat1, goat2, goat3, goat4;
 	
 	private BufferedImage earthGod, bg, frame;
 	private int godX, godY, godWidth, godHeight;
@@ -69,10 +69,12 @@ public class EarthState extends GameState{
 					);
 			
 			tileMap = new TileMap(tilemap, lvmk.getTileTypes(), lvmk.getEnemyData());
-			player = new Player(tileMap, gsm.getFire(), gsm.getAir(), gsm.getDifficulty());
+			player = new Player(tileMap, gsm.getDifficulty());
 			textEventListener = new TextEventListener();
 			goat1 = new Goat(tileMap, 3 * tileMap.getTileSize(), 27 * tileMap.getTileSize());
 			goat2 = new Goat(tileMap, 7 * tileMap.getTileSize(), 26 * tileMap.getTileSize());
+			goat3 = new Goat(tileMap, 30 * tileMap.getTileSize(), 4 * tileMap.getTileSize());
+			goat4 = new Goat(tileMap, 23 * tileMap.getTileSize(), 8 * tileMap.getTileSize());
 			
 		} catch (IOException e){
 			System.out.println("Couldn't find something");
@@ -87,6 +89,8 @@ public class EarthState extends GameState{
 		
 		goat1.spawn();
 		goat2.spawn();
+		goat3.spawn();
+		goat4.spawn();
 		player.spawn();
 		
 		tileMap.center(player.getX(), player.getY());
@@ -115,7 +119,10 @@ public class EarthState extends GameState{
 			
 			if (!textEventListener.isPlaying()){
 				
-				if (goat1.isDead() && goat2.isDead()){
+				if (goat1.isDead() && 
+					goat2.isDead() &&
+					goat3.isDead() &&
+					goat4.isDead()){
 					if (earthGodThanks.isDone()){
 						stopSound();
 						gsm.complete(GameStateManager.EARTHSTATE);
@@ -145,6 +152,14 @@ public class EarthState extends GameState{
 			if (!goat2.isDead()){
 				goat2.getNextPosition(player);
 				goat2.update();
+			}
+			if (!goat3.isDead()){
+				goat3.getNextPosition(player);
+				goat3.update();
+			}
+			if (!goat4.isDead()){
+				goat4.getNextPosition(player);
+				goat4.update();
 			}
 		}
 		
@@ -186,7 +201,23 @@ public class EarthState extends GameState{
 							goat2.getY() < tileMap.getY() + GamePanel.HEIGHT){
 						goat2.draw(frameGraphics);
 					}
-
+					
+					if (!goat3.isDead() &&
+							goat3.getX() + goat3.getWidth() > tileMap.getX() &&
+							goat3.getX() < tileMap.getX() + GamePanel.WIDTH && 
+							goat3.getY() + goat3.getHeight() > tileMap.getY() && 
+							goat3.getY() < tileMap.getY() + GamePanel.HEIGHT){
+						goat3.draw(frameGraphics);
+					}
+					
+					if (!goat4.isDead() &&
+							goat4.getX() + goat4.getWidth() > tileMap.getX() &&
+							goat4.getX() < tileMap.getX() + GamePanel.WIDTH && 
+							goat4.getY() + goat4.getHeight() > tileMap.getY() && 
+							goat4.getY() < tileMap.getY() + GamePanel.HEIGHT){
+						goat4.draw(frameGraphics);
+					}
+					
 					g.drawImage(frame.getSubimage(tileMap.getDrawX(), tileMap.getDrawY(), GamePanel.WIDTH * GamePanel.SCALE, GamePanel.HEIGHT * GamePanel.SCALE),
 							0,
 							0,

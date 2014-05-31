@@ -85,7 +85,7 @@ public class Eyeball extends Enemy{
 				)
 			){
 			playSound("Player/sword_impact");
-			takeDamage(3);
+			takeDamage(Player.getDamage());
 		}
 		
 		int code = Sprite.isTouching(new Rectangle((int)x, (int)y, width, height),

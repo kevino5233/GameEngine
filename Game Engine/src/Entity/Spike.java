@@ -24,7 +24,9 @@ public class Spike extends Enemy{
 		width = 16;
 		
 		try{
-			sprite = ImageIO.read(new File("./Resources/Sprites/Enemies/Spike.png"));
+			sprite = ImageIO.read(
+					this.getClass().getResourceAsStream("/Resources/Sprites/Enemies/Spike.png")
+					);
 		} catch (IOException e){
 			System.out.println("COuldn't find picture");
 		} catch (Exception e){

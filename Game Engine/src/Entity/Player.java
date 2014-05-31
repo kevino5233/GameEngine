@@ -22,6 +22,8 @@ public class Player extends Sprite{
 	private static final double GRAVITY = 0.5;
 	private double jumpStart;
 	
+	private static boolean fire, air;
+	
 	private boolean moving;
 	
 	private Animation swordamatino;
@@ -41,7 +43,7 @@ public class Player extends Sprite{
 	//private static int EARTHMOVE = 6;
 	//private static int AIRMOVE = 8;
 	
-	public Player(TileMap tm, boolean fire, boolean air, int difficulty){
+	public Player(TileMap tm, int difficulty){
 		super(tm);
 		
 		spawnX = tm.getPlayerSpawnX();
@@ -50,13 +52,13 @@ public class Player extends Sprite{
 		width = 16;
 		height = 32;
 		
+		terminalVelocity = 10;
+		jumpStart = -10;
+		
 		maxHealth = 15 + difficulty * 2;
 		
 		framesInvincible = 30;
 		framesLeftInvincible = 0;
-		
-		terminalVelocity = air ? 10 : 8;
-		jumpStart = -terminalVelocity;
 		
 		right = true;
 		
@@ -66,7 +68,9 @@ public class Player extends Sprite{
 		swordamatino = new Animation();
 		
 		try{
-			BufferedImage temp = ImageIO.read(new File("./Resources/Sprites/Player/player" + (fire ? "-fire" : "") + ".png"));
+			BufferedImage temp = ImageIO.read(
+					this.getClass().getResourceAsStream("/Resources/Sprites/Player/player.png")
+					);
 			for (int j = 0; j < numFrames.length; j++){	
 				spriteSheet[j * 2] = new BufferedImage[numFrames[j]];
 				spriteSheet[j * 2 + 1] = new BufferedImage[numFrames[j]];
@@ -78,7 +82,9 @@ public class Player extends Sprite{
 				}
 			}
 			
-			temp = ImageIO.read(new File("./Resources/Sprites/Player/sword.png"));
+			temp = ImageIO.read(
+					this.getClass().getResourceAsStream("/Resources/Sprites/Player/sword.png")
+					);
 			for (int j = 0; j < swordFrames.length; j++){	
 				swordSheet[j * 2] = new BufferedImage[swordFrames[j]];
 				swordSheet[j * 2 + 1] = new BufferedImage[swordFrames[j]];
@@ -100,6 +106,42 @@ public class Player extends Sprite{
 		animatino = new Animation();
 		
 	}
+	
+	@Override
+	public void spawn() {
+		x = spawnX;
+		y = spawnY;
+		terminalVelocity = air ? 12 : 10;
+		jumpStart = -terminalVelocity;
+		
+		try{
+			BufferedImage temp = ImageIO.read(
+					this.getClass().getResourceAsStream("/Resources/Sprites/Player/sword" + (fire ? "-fire" : "") + ".png")
+					);
+			for (int j = 0; j < swordFrames.length; j++){	
+				swordSheet[j * 2] = new BufferedImage[swordFrames[j]];
+				swordSheet[j * 2 + 1] = new BufferedImage[swordFrames[j]];
+				for (int i = 0; i < swordFrames[j]; i++){
+					swordSheet[j * 2][i] = temp.getSubimage(i * width, (j * 2) * height, width, height);
+				}
+				for (int i = 0; i < swordFrames[j]; i++){
+					swordSheet[j * 2 + 1][i] = temp.getSubimage(i * width, (j * 2 + 1) * height, width, height);
+				}
+			}
+			
+		} catch (Exception e){
+			System.out.println("You be fucked son");
+			e.printStackTrace();
+		}
+		currentState = IDLE;
+		health = maxHealth;
+		right = true;
+		animatino.setFrames(spriteSheet[IDLE * 2], 10, false);
+		framesLeftInvincible= 0;
+		dx = 0;
+		System.out.println("Done");
+	}
+	
 
 	@Override
 	public void init() {
@@ -309,18 +351,6 @@ public class Player extends Sprite{
 		dy /= 3;
 	}
 
-	@Override
-	public void spawn() {
-		x = spawnX;
-		y = spawnY;
-		currentState = IDLE;
-		health = maxHealth;
-		right = true;
-		animatino.setFrames(spriteSheet[IDLE * 2], 10, false);
-		framesLeftInvincible= 0;
-		dx = 0;
-		System.out.println("Done");
-	}
 	
 	@Override
 	public void takeDamage(int damage){
@@ -516,6 +546,9 @@ public class Player extends Sprite{
 		return "aNIMATINO";
 	}
 
+	public static void setFire(boolean f){ fire = f; }
+	public static void setAir(boolean a){ air = a; }
 	
+	public static int getDamage(){ return fire ? 5 : 3; }
 	
 }

@@ -274,6 +274,9 @@ public class MenuState extends GameState implements ActionListener{
 			passwordTextField.setText("");
 			
 			try{
+				
+				gsm.reset();
+				
 				File saves = new File("Save Profiles");
 				if (!saves.exists()){
 					saves.mkdir();
@@ -284,7 +287,6 @@ public class MenuState extends GameState implements ActionListener{
 				}
 				
 				Scanner in = new Scanner(profile);
-
 
 				if (in.hasNext()){
 					String tempUsername = in.next();

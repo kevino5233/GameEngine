@@ -56,7 +56,9 @@ public class TextEvent {
 		display += d + word;
 		
 		try{
-			box = ImageIO.read(new File("./Resources/Sprites/Objects/Textbox.png"));
+			box = ImageIO.read(
+					this.getClass().getResourceAsStream("/Resources/Sprites/Objects/Textbox.png")
+					);
 		} catch (IOException e){
 			System.out.println("Couldn't find the file");
 		}
